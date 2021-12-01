@@ -1,8 +1,12 @@
+import os
+INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
+
+
 def sonar_sweep():
     """each line is a measurement of the sea floor depth as the sweep 
     looks further and further away from the submarine."""
 
-    with open('input.txt') as file:
+    with open(INPUT_FILE) as file:
         lines = file.readlines()
 
     as_numbers = map(int, lines)
