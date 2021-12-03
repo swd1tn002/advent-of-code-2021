@@ -1,7 +1,11 @@
 from diagnostic import read_report, find_most_common_bits, bits_to_decimal
 
 
-def filter_by_common_bits(report: list[list[int]], most_common=True):
+def filter_by_common_bits_in_each_position(report: list[list[int]], most_common=True):
+    """
+    Determine the most common value (0 or 1) in each bit position, and keep only the lists
+    with either the most or least common bit in that position, determined by the most_common parameter.
+    """
     filtered = report
 
     for bit_position in range(0, len(report[0])):
@@ -25,7 +29,7 @@ def find_oxygen_generator_rating(report: list[list[int]]) -> list[int]:
     each bit position, and keep only numbers with that bit in that position.
     If 0 and 1 are equally common, keep values with a 1 in the position being considered.
     """
-    return filter_by_common_bits(report, True)
+    return filter_by_common_bits_in_each_position(report, True)
 
 
 def find_co2_generator_rating(report: list[list[int]]) -> list[int]:
@@ -33,7 +37,7 @@ def find_co2_generator_rating(report: list[list[int]]) -> list[int]:
     To determine the CO2 scrubber rating value keep only the numbers
     with least common bits in each position.
     """
-    return filter_by_common_bits(report, False)
+    return filter_by_common_bits_in_each_position(report, False)
 
 
 if __name__ == '__main__':

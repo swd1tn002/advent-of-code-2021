@@ -9,7 +9,7 @@ def convert_to_bits(line: str) -> list[int]:
     return list(map(int, line))
 
 
-def read_report():
+def read_report() -> list[list[int]]:
     """
     The diagnostic report (your puzzle input) consists of a list of binary numbers which,
     when decoded properly, can tell you many useful things about the conditions of the
@@ -21,7 +21,7 @@ def read_report():
     return list(map(convert_to_bits, lines))
 
 
-def most_common_bit(bits: list[int], tie=1) -> int:
+def most_common_bit(bits: list[int]) -> int:
     """
     Returns the most common bit in given list. In case of a tie, returns 1.
     """
@@ -32,7 +32,7 @@ def most_common_bit(bits: list[int], tie=1) -> int:
     return 0 if zeros > ones else 1
 
 
-def find_most_common_bits(data: list, tie=1) -> list[int]:
+def find_most_common_bits(data: list) -> list[int]:
     """
     Returns a list of most common bits in each position. In case of a tie, returns 1
     """
@@ -41,7 +41,7 @@ def find_most_common_bits(data: list, tie=1) -> list[int]:
     return list(common_bits)
 
 
-def invert_bits(bits):
+def invert_bits(bits: list[int]) -> list[int]:
     """
     Returns a new list with ones as zeros and vice versa
     """
