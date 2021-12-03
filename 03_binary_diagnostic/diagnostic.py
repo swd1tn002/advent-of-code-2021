@@ -33,9 +33,10 @@ def most_common_bit(bits: List[int]) -> int:
     return 0 if zeros > ones else 1
 
 
-def find_most_common_bits(data: List) -> List[int]:
+def find_most_common_bits(data: List[List[int]]) -> List[int]:
     """
-    Returns a list of most common bits in each position. In case of a tie, returns 1
+    Returns a list of most common bits in each position across multiple bit lists.
+    In case of a tie between ones and zeros, uses 1.
     """
     zipped = zip(*data)
     common_bits = map(most_common_bit, zipped)
@@ -46,7 +47,8 @@ def invert_bits(bits: List[int]) -> List[int]:
     """
     Returns a new list with ones as zeros and vice versa
     """
-    return list(map(lambda bit: bit ^ 1, bits))  # bitwise xor
+    def invert(bit): return bit ^ 1  # bitwise xor changes 0 to 1 and 1 to 0
+    return list(map(invert, bits))
 
 
 def bits_to_decimal(bits: List[int]) -> int:

@@ -21,24 +21,27 @@ def filter_by_common_bits_in_each_position(report: List[List[int]], most_common=
         if len(filtered) == 1:
             break
 
-    return bits_to_decimal(filtered[0])
+    return filtered
 
 
-def find_oxygen_generator_rating(report: List[List[int]]) -> List[int]:
+def find_oxygen_generator_rating(report: List[List[int]]) -> int:
     """
     To find oxygen generator rating, determine the most common value (0 or 1) in
     each bit position, and keep only numbers with that bit in that position.
     If 0 and 1 are equally common, keep values with a 1 in the position being considered.
     """
-    return filter_by_common_bits_in_each_position(report, True)
+    filtered = filter_by_common_bits_in_each_position(report, most_common=True)
+    return bits_to_decimal(filtered[0])
 
 
-def find_co2_generator_rating(report: List[List[int]]) -> List[int]:
+def find_co2_generator_rating(report: List[List[int]]) -> int:
     """
     To determine the CO2 scrubber rating value keep only the numbers
     with least common bits in each position.
     """
-    return filter_by_common_bits_in_each_position(report, False)
+    filtered = filter_by_common_bits_in_each_position(
+        report, most_common=False)
+    return bits_to_decimal(filtered[0])
 
 
 if __name__ == '__main__':
