@@ -1,15 +1,16 @@
 import os
+from typing import List
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 
-def convert_to_bits(line: str) -> list[int]:
+def convert_to_bits(line: str) -> List[int]:
     """
     Takes a str with numbers 0 and 1 and returns them as a list of ints.
     """
     return list(map(int, line))
 
 
-def read_report() -> list[list[int]]:
+def read_report() -> List[List[int]]:
     """
     The diagnostic report (your puzzle input) consists of a list of binary numbers which,
     when decoded properly, can tell you many useful things about the conditions of the
@@ -21,7 +22,7 @@ def read_report() -> list[list[int]]:
     return list(map(convert_to_bits, lines))
 
 
-def most_common_bit(bits: list[int]) -> int:
+def most_common_bit(bits: List[int]) -> int:
     """
     Returns the most common bit in given list. In case of a tie, returns 1.
     """
@@ -32,7 +33,7 @@ def most_common_bit(bits: list[int]) -> int:
     return 0 if zeros > ones else 1
 
 
-def find_most_common_bits(data: list) -> list[int]:
+def find_most_common_bits(data: List) -> List[int]:
     """
     Returns a list of most common bits in each position. In case of a tie, returns 1
     """
@@ -41,14 +42,14 @@ def find_most_common_bits(data: list) -> list[int]:
     return list(common_bits)
 
 
-def invert_bits(bits: list[int]) -> list[int]:
+def invert_bits(bits: List[int]) -> List[int]:
     """
     Returns a new list with ones as zeros and vice versa
     """
     return list(map(lambda bit: bit ^ 1, bits))  # bitwise xor
 
 
-def bits_to_decimal(bits: list[int]) -> int:
+def bits_to_decimal(bits: List[int]) -> int:
     """
     Converts a list of int bits to a decimal number
     """
