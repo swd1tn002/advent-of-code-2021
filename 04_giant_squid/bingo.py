@@ -51,7 +51,8 @@ def find_winner(boards: List[List[List[int]]], drawn_numbers: List[int]) -> List
         winners = [board for board in boards if check_winner(board, numbers)]
         if winners:
             return winners[0], numbers
-    return None
+
+    return None, drawn_numbers
 
 
 def find_loser(boards: List[List[List[int]]], drawn_numbers: List[int]) -> List[List[int]]:
@@ -63,14 +64,15 @@ def find_loser(boards: List[List[List[int]]], drawn_numbers: List[int]) -> List[
     for round in range(len(boards[0][0]), len(drawn_numbers) + 1):
         numbers = drawn_numbers[:round]
 
-        losers = [board for board in boards if check_winner(
+        losers = [board for board in remaining if check_winner(
             board, numbers) == False]
 
         if len(losers) == 0:
             return remaining[0], numbers
 
         remaining = losers
-    return None
+
+    return None, drawn_numbers
 
 
 def calculate_score(board: List[List[int]], marked: List[int]) -> int:
