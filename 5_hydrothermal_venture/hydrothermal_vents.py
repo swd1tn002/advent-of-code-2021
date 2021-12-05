@@ -7,7 +7,7 @@ Point = namedtuple('Point', 'x y')
 Line = namedtuple('Line', 'start end')
 
 
-def read_coordinate_file(filename=INPUT_FILE) -> List[Tuple[Point]]:
+def read_coordinate_file(filename=INPUT_FILE) -> List[Line]:
     """
     Each line of vents is given as a line segment in the format x1,y1 -> x2,y2 
     where x1,y1 are the coordinates of one end the line segment and x2,y2 are
@@ -36,7 +36,7 @@ def parse_coordinate(point: str) -> Point:
     return Point(x, y)
 
 
-def filter_straight_lines(lines: List[Tuple[Point]]):
+def filter_straight_lines(lines: List[Line]):
     """
     Only consider horizontal and vertical lines: lines where either x1 = x2 or y1 = y2.
     """
