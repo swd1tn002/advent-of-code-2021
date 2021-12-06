@@ -11,9 +11,9 @@ def read_population_ages(filename=INPUT_FILE) -> List[int]:
     Returns the population in a list grouped to list indices by their ages,
     for example '1,1,3,3,0,3' => [1, 2, 3, 0, 0, 0, 0, 0]
     """
+    grouped = [0] * 9
     with open(filename) as file:
-        ages = list(map(int, file.read().split(',')))
-        grouped = [0] * 9
+        ages = map(int, file.read().split(','))
         for age in ages:
             grouped[age] += 1
     return grouped
