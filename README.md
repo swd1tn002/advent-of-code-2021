@@ -8,23 +8,27 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * Pytest
     * GitHub actions
-    * map function
+    * `map` function
 
 * Day 3
 
     * type hinting
     * `from typing import List`
-    * zip function
-    * bitwise xor
+    * `zip` function
+    * bitwise xor `^`
     * parsing binary numbers to decimals
-    * pytest @fixture
+    * pytest `@fixture`
 
 * Day 4
 
-    * zip function
-    * transposing a matrix with zip function
+    * `zip` function
+    * transposing a matrix with `zip` function
     * flatmap with Python generators
 
 * Day 5
 
     * named tuples
+
+* Day 6
+
+    * using `pop` to simulate a queue with a list
