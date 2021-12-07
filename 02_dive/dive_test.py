@@ -1,4 +1,4 @@
-from dive import read_course_file, parse_line, dive
+from dive import read_course_file, parse_line, dive, Command
 
 
 def test_reading_submarine_course():
@@ -17,12 +17,12 @@ def test_parsing_line():
 
 def test_dive():
     horizontal, depth = dive([
-        ('forward', 5),
-        ('down', 5),
-        ('forward', 8),
-        ('up', 3),
-        ('down', 8),
-        ('forward', 2)
+        Command('forward', 5),
+        Command('down', 5),
+        Command('forward', 8),
+        Command('up', 3),
+        Command('down', 8),
+        Command('forward', 2)
     ])
     assert horizontal == 15
     assert depth == 10

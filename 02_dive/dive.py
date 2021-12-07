@@ -1,15 +1,18 @@
+from collections import namedtuple
 import os
+
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
+
+Command = namedtuple('Command', 'direction amount')
 
 
 def parse_line(line):
-    command, amount = line.split(' ')
-    return (command, int(amount))
+    direction, amount = line.split(' ')
+    return Command(direction, int(amount))
 
 
 def read_course_file():
     """The submarine seems to already have a planned course (your puzzle input)."""
-
     with open(INPUT_FILE) as file:
         lines = file.readlines()
 
@@ -17,16 +20,11 @@ def read_course_file():
 
 
 def dive(course):
-    horizontal = 0
-    depth = 0
-    for command, amount in course:
-        if command == 'forward':
-            horizontal += amount
-        elif command == 'up':
-            depth -= amount
-        elif command == 'down':
-            depth += amount
-    return (horizontal, depth)
+    fwd = sum(c.amount for c in course if c.direction == 'forward')
+    up = sum(c.amount for c in course if c.direction == 'up')
+    down = sum(c.amount for c in course if c.direction == 'down')
+
+    return (fwd, down - up)
 
 
 if __name__ == '__main__':
