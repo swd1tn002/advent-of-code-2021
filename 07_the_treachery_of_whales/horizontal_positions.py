@@ -18,7 +18,6 @@ def calculate_total_linear_cost_to(items: List[int], target: int) -> int:
 
 
 def calculate_total_non_linear_cost_to(positions: List[int], target: int) -> int:
-    known_costs = {}
     distances = get_distances_to(positions, target)
     return sum(_get_non_linear_cost(distance) for distance in distances)
 
@@ -31,18 +30,21 @@ def _get_non_linear_cost(distance: int) -> int:
 if __name__ == '__main__':
     crabs = read_crab_coordinates()
 
-    costs_1 = [calculate_total_linear_cost_to(
-        crabs, i) for i in range(0, max(crabs))]
+    costs_per_guess_1 = [calculate_total_linear_cost_to(
+        crabs, guess) for guess in range(0, max(crabs))]
 
     # Part 1
-    min_cost_1 = min(costs_1)
-    position_1 = costs_1.index(min_cost_1)
+    min_cost_1 = min(costs_per_guess_1)
+    best_guess_1 = costs_per_guess_1.index(min_cost_1)
 
-    print(f'First part: Moce crabs to {position_1} with cost: {min_cost_1}')
+    print(
+        f'First part: Moce crabs to {best_guess_1} with cost: {min_cost_1}')
 
     # Part 2
-    costs_2 = [calculate_total_non_linear_cost_to(
-        crabs, i) for i in range(0, max(crabs))]
-    min_cost_2 = min(costs_2)
-    position_2 = costs_2.index(min_cost_2)
-    print(f'Second part: Moce crabs to {position_2} with cost: {min_cost_2}')
+    costs_per_guess_2 = [calculate_total_non_linear_cost_to(
+        crabs, guess) for guess in range(0, max(crabs))]
+
+    min_cost_2 = min(costs_per_guess_2)
+    best_guess_2 = costs_per_guess_2.index(min_cost_2)
+    print(
+        f'Second part: Moce crabs to {best_guess_2} with cost: {min_cost_2}')
