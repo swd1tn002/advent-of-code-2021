@@ -1,4 +1,5 @@
 from typing import List
+from functools import cache
 import os
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
@@ -19,16 +20,12 @@ def calculate_total_linear_cost_to(items: List[int], target: int) -> int:
 def calculate_total_non_linear_cost_to(positions: List[int], target: int) -> int:
     known_costs = {}
     distances = get_distances_to(positions, target)
-    return sum(_get_non_linear_cost(distance, known_costs) for distance in distances)
+    return sum(_get_non_linear_cost(distance) for distance in distances)
 
 
-def _get_non_linear_cost(distance: int, cache: dict) -> int:
-    if distance in cache:
-        return cache[distance]
-    else:
-        cost = sum(i for i in range(0, distance+1))
-        cache[distance] = cost
-        return cost
+@cache
+def _get_non_linear_cost(distance: int) -> int:
+    return sum(i for i in range(0, distance+1))
 
 
 if __name__ == '__main__':

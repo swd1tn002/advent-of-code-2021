@@ -32,3 +32,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * Day 6
 
     * using `pop` to simulate a queue with a list
+
+* Day 7
+
+    * speeding up recurring calls to function by memoizing the results with `@cache` decorator
