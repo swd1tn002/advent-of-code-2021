@@ -36,3 +36,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * Day 7
 
     * speeding up recurring calls to function by memoizing the results with `@cache` decorator
+
+* Day 8
+
+    * all sorts of set operations

@@ -10,8 +10,8 @@ def sample_input():
 def test_parse_note(sample_input):
     note = parse_note(sample_input)
 
-    assert note.patterns == ['abcdefg', 'bcdef', 'acdfg',
-                             'abcdf', 'abd', 'abcdef', 'bcdefg', 'abef', 'abcdeg', 'ab']
+    assert note.patterns == {'abcdefg', 'bcdef', 'acdfg',
+                             'abcdf', 'abd', 'abcdef', 'bcdefg', 'abef', 'abcdeg', 'ab'}
     assert note.output == ['bcdef', 'abcdf', 'bcdef', 'abcdf']
 
 
