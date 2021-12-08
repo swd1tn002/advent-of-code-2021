@@ -40,3 +40,4 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * Day 8
 
     * all sorts of set operations
+    * iter and next
