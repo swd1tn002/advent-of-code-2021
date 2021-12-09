@@ -41,3 +41,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * all sorts of set operations
     * iter and next
+
+* Day 9
+
+    * enumerate

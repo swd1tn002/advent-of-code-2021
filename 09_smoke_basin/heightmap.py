@@ -44,14 +44,8 @@ def find_neighbors(heightmap: Dict[Coord, int], coord: Coord) -> Set[Coord]:
     locations on the edge or corner of the map have three or two adjacent locations,
     respectively. (Diagonal locations do not count as adjacent.)
     """
-    neighbors = {
-        Coord(coord.x, coord.y - 1),
-        Coord(coord.x, coord.y + 1),
-        Coord(coord.x - 1, coord.y),
-        Coord(coord.x + 1, coord.y)
-    }
-
-    return {c for c in neighbors if c in heightmap}
+    x, y = coord
+    return {Coord(_x, _y) for (_x, _y) in ((x, y-1), (x, y+1), (x-1, y), (x+1, y)) if (_x, _y) in heightmap}
 
 
 if __name__ == '__main__':
