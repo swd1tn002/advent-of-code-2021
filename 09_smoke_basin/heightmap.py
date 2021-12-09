@@ -43,6 +43,24 @@ def find_neighbors(heightmap: Dict[Coord, int], coord: Coord) -> Set[Coord]:
     return {Coord(_x, _y) for (_x, _y) in ((x, y-1), (x, y+1), (x-1, y), (x+1, y)) if (_x, _y) in heightmap}
 
 
+def find_basins(heightmap: Dict[Coord, int], points: List[Coord]) -> List[List[Coord]]:
+    return [find_basin(heightmap, coord) for coord in points]
+
+
+def find_basin(heightmap: Dict[Coord, int], point: Coord) -> Set[Coord]:
+    visited = set()
+    not_visited = [point]
+
+    while len(not_visited) > 0:
+        next = not_visited.pop(0)
+
+        visited.add(next)
+        not_visited = not_visited + [n for n in find_neighbors(
+            heightmap, next) if heightmap[n] != 9 and n not in visited and n not in not_visited]
+
+    return visited
+
+
 if __name__ == '__main__':
     heightmap = read_heightmap()
     print(heightmap)
@@ -66,3 +84,10 @@ if __name__ == '__main__':
 
     # Part 1: What is the sum of the risk levels of all low points on your heightmap?
     print(f'Risk level: {risk_levels}')
+
+    basins = find_basins(heightmap, low_points)
+    basin_sizes = list(map(len, basins))
+    basin_sizes.sort()
+
+    # Part 2: What do you get if you multiply together the sizes of the three largest basins?
+    print(f'Part 2: {basin_sizes[-3] * basin_sizes[-2] * basin_sizes[-1]}')
