@@ -1,4 +1,4 @@
-from heightmap import Coord, parse_heightmap
+from heightmap import Coord, parse_heightmap, find_neighbors
 
 test_input = ['2199943210',
               '3987894921',
@@ -13,3 +13,10 @@ def test_parse_heightmap():
     assert heightmap[Coord(0, 0)] == 2
     assert heightmap[Coord(0, 1)] == 3
     assert heightmap[Coord(1, 0)] == 1
+
+
+def test_find_neighbors():
+    heightmap = parse_heightmap(test_input)
+    neighbors = find_neighbors(heightmap, Coord(0, 0))
+
+    assert neighbors == {Coord(0, 1), Coord(1, 0)}
