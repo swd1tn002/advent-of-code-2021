@@ -20,7 +20,7 @@ def parse_heightmap(input: List[str]) -> Dict[Coord, int]:
     """
     Parses the given list of strings into a dict with the x and y axis coordinates as
     keys and respective numbers as values:
-    ["1", "2"], ["6", "5"] =>  { Coord(x=0, y=0): 1, Coord(x=1, y=0): 2, Coord(x=0, y=1): 6, Coord(x=1, y=1): 5 }
+    ["12", "65"] =>  { Coord(x=0, y=0): 1, Coord(x=1, y=0): 2, Coord(x=0, y=1): 6, Coord(x=1, y=1): 5 }
     """
     rows_and_cols = list(map(line_to_ints, input))
     return {Coord(x, y): value for (y, row) in enumerate(rows_and_cols) for (x, value) in enumerate(row)}
