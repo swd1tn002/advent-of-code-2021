@@ -1,4 +1,4 @@
-from heightmap import Coord, parse_heightmap, find_neighbors, find_basin
+from heightmap import Coord, parse_heightmap, find_neighbors, find_basin, find_low_points
 
 test_input = ['2199943210',
               '3987894921',
@@ -20,6 +20,16 @@ def test_find_neighbors():
     neighbors = find_neighbors(heightmap, Coord(0, 0))
 
     assert neighbors == {Coord(0, 1), Coord(1, 0)}
+
+
+def test_find_low_points():
+    heightmap = parse_heightmap(test_input)
+    low_points = find_low_points(heightmap)
+
+    assert set(low_points) == {Coord(x=1, y=0),
+                               Coord(x=9, y=0),
+                               Coord(x=6, y=4),
+                               Coord(x=2, y=2)}
 
 
 def test_find_basin():

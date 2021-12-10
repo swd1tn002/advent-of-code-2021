@@ -48,26 +48,30 @@ def find_basins(heightmap: Dict[Coord, int], points: List[Coord]) -> List[List[C
 
 
 def find_basin(heightmap: Dict[Coord, int], point: Coord) -> Set[Coord]:
+    """
+    A basin is all locations that eventually flow downward to a single low point. Therefore,
+    every low point has a basin, although some basins are very small. Locations of height 9
+    do not count as being in any basin, and all other locations will always be part of 
+    exactly one basin.
+    """
     visited = set()
-    not_visited = [point]
+    queue = [point]
 
-    while len(not_visited) > 0:
-        next = not_visited.pop(0)
+    while len(queue) > 0:
+        next = queue.pop(0)
 
         visited.add(next)
-        not_visited = not_visited + [n for n in find_neighbors(
-            heightmap, next) if heightmap[n] != 9 and n not in visited and n not in not_visited]
+        queue += [n for n in find_neighbors(heightmap, next)
+                  if heightmap[n] != 9 and n not in {*visited, * queue}]
 
     return visited
 
 
-if __name__ == '__main__':
-    heightmap = read_heightmap()
-    print(heightmap)
-
-    height = max(coord.y for coord in heightmap.keys()) + 1
-    width = max(coord.x for coord in heightmap.keys()) + 1
-
+def find_low_points(heightmap: Dict[Coord, int]) -> List[Coord]:
+    """
+    Your first goal is to find the low points - the locations that are lower than any 
+    of its adjacent locations.
+    """
     low_points = []
 
     # Your first goal is to find the low points - the locations that are lower than any of its adjacent locations.
@@ -77,17 +81,25 @@ if __name__ == '__main__':
         if all(value < neighbour for neighbour in adjacent_values):
             low_points.append(coord)
 
-    # The risk level of a low point is 1 plus its height
-    risk_levels = sum(1 + heightmap[c] for c in low_points)
+    return low_points
+
+
+if __name__ == '__main__':
+    heightmap = read_heightmap()
+
+    low_points = find_low_points(heightmap)
 
     print(f'Low points: {low_points}')
 
     # Part 1: What is the sum of the risk levels of all low points on your heightmap?
+    # The risk level of a low point is 1 plus its height
+    risk_levels = sum(1 + heightmap[c] for c in low_points)
+
     print(f'Risk level: {risk_levels}')
 
+    # Part 2: What do you get if you multiply together the sizes of the three largest basins?
     basins = find_basins(heightmap, low_points)
     basin_sizes = list(map(len, basins))
     basin_sizes.sort()
 
-    # Part 2: What do you get if you multiply together the sizes of the three largest basins?
     print(f'Part 2: {basin_sizes[-3] * basin_sizes[-2] * basin_sizes[-1]}')
