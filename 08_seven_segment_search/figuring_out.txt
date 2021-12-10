@@ -1,0 +1,26 @@
+1	2           *
+2	    5       *
+3	    5       *
+4	4           *
+5	    5       *
+6	  6
+7	3           *
+8	7           *
+9	  6         *
+0 	  6
+
+Number 6: length 6, but not 9. Does not contain all segments from 1.
+
+Numbers 1, 4, 7 and 8 are already known
+
+Number 3: length 5, contains both segments from 1
+Number 9: length 6, only where segments from 3 subtracted leave one segment remaining
+
+Luku 5, pituus 5, mutta ei kolmonen.
+4 - 3 jäljelle jää segmentti, joka kuuluu lukuun 5, mutta ei 2
+
+Number 6: length 6
+
+Number 5: length 5, sisältää vain yhden segmentin ero ysiin
+Number 2: length 5, mutta eri kuin 3 ja 5
+Number 0: length 6, sisältää samat kuin 1 mutta ei ole sama kuin 9.

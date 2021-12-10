@@ -52,18 +52,14 @@ def decode_note(note: Note) -> List[str]:
     Decodes a Note with a set of patterns and a list of encoded digits int a list of ints
     "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf" => [5, 3, 5, 3]
     """
-    decoded = dict([(decode_zero(note.patterns), 0),
-                    (decode_one(note.patterns), 1),
-                    (decode_two(note.patterns), 2),
-                    (decode_three(note.patterns), 3),
-                    (decode_four(note.patterns), 4),
-                    (decode_five(note.patterns), 5),
-                    (decode_six(note.patterns), 6),
-                    (decode_seven(note.patterns), 7),
-                    (decode_eight(note.patterns), 8),
-                    (decode_nine(note.patterns), 9)])
+    decoders = [decode_zero, decode_one, decode_two,
+                decode_three, decode_four, decode_five,
+                decode_six, decode_seven, decode_eight, decode_nine]
 
-    return [decoded[x] for x in note.output if x in decoded]
+    # creates a dict with the segment patterns as keys and their corresponding ints as values
+    decoded = {func(note.patterns): i for (i, func) in enumerate(decoders)}
+
+    return [decoded[x] for x in note.output]
 
 
 def decode_zero(patterns: Set[int]) -> str:
