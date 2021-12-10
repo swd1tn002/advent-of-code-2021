@@ -45,3 +45,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * Day 9
 
     * enumerate
+
+* Day 10
+
+    * regular expressions
