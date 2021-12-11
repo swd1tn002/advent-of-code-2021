@@ -6,9 +6,10 @@ from collections import namedtuple
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 Coord = namedtuple('Coord', 'x y')
+Grid = Dict[Coord, int]
 
 
-def read_energy_levels(filename=INPUT_FILE) -> Dict[Coord, int]:
+def read_energy_levels(filename=INPUT_FILE) -> Grid:
     """
     Each octopus has an energy level - your submarine can remotely measure 
     the energy level of each octopus (your puzzle input)
@@ -17,7 +18,7 @@ def read_energy_levels(filename=INPUT_FILE) -> Dict[Coord, int]:
         return parse_energy_levels(file.readlines())
 
 
-def parse_energy_levels(input: List[str]) -> Dict[Coord, int]:
+def parse_energy_levels(input: List[str]) -> Grid:
     """
     Parses the given list of strings into a dict with the x and y axis coordinates as
     keys and respective numbers as values:
@@ -34,7 +35,7 @@ def line_to_ints(line: str) -> List[int]:
     return list(map(int, line.strip()))
 
 
-def find_neighbors(grid: Dict[Coord, int], coord: Coord) -> Set[Coord]:
+def find_neighbors(grid: Grid, coord: Coord) -> Set[Coord]:
     """
     Get adjacent coordinates including ones that are diagonally adjacent.
     """
@@ -42,7 +43,7 @@ def find_neighbors(grid: Dict[Coord, int], coord: Coord) -> Set[Coord]:
     return {Coord(_x, _y) for _x in range(x-1, x+2) for _y in range(y-1, y+2) if (_x, _y) in grid and coord != (_x, _y)}
 
 
-def next_step(grid: Dict[Coord, int]) -> Tuple[Dict[Coord, int], int]:
+def next_step(grid: Grid) -> Tuple[Grid, int]:
     # First, the energy level of each octopus increases by 1.
     new_grid = {c: level+1 for c, level in grid.items()}
 
@@ -66,7 +67,7 @@ def next_step(grid: Dict[Coord, int]) -> Tuple[Dict[Coord, int], int]:
     return {c: level if level <= 9 else 0 for c, level in new_grid.items()}, len(flashed)
 
 
-def print_grid(grid: Dict[Coord, int]) -> None:
+def print_grid(grid: Grid) -> None:
     w = max(c.x for c in grid.keys()) + 1
     h = max(c.y for c in grid.keys()) + 1
 
