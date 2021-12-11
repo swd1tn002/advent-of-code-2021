@@ -1,6 +1,6 @@
 
 import os
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 from collections import namedtuple
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -42,7 +42,7 @@ def find_neighbors(grid: Dict[Coord, int], coord: Coord) -> Set[Coord]:
     return {Coord(_x, _y) for _x in range(x-1, x+2) for _y in range(y-1, y+2) if (_x, _y) in grid and coord != (_x, _y)}
 
 
-def next_step(grid: Dict[Coord, int]) -> Dict[Coord, int]:
+def next_step(grid: Dict[Coord, int]) -> Tuple[Dict[Coord, int], int]:
     # First, the energy level of each octopus increases by 1.
     new_grid = {c: level+1 for c, level in grid.items()}
 
@@ -66,7 +66,7 @@ def next_step(grid: Dict[Coord, int]) -> Dict[Coord, int]:
     return {c: level if level <= 9 else 0 for c, level in new_grid.items()}, len(flashed)
 
 
-def test_print(grid: Dict[Coord, int]) -> None:
+def print_grid(grid: Dict[Coord, int]) -> None:
     w = max(c.x for c in grid.keys()) + 1
     h = max(c.y for c in grid.keys()) + 1
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
         grid, flashed = next_step(grid)
         flashes += flashed
 
-    test_print(grid)
+    print_grid(grid)
 
     print(f'Part 1: flashed {flashes} times')
 
