@@ -7,17 +7,6 @@ INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 Coord = namedtuple('Coord', 'x y')
 
-lines = """5421451741
-3877321568
-7583273864
-3451717778
-2651615156
-6377167526
-5182852831
-4766856676
-3437187583
-3633371586""".split('\n')
-
 
 def read_energy_levels(filename=INPUT_FILE) -> Dict[Coord, int]:
     """
@@ -50,7 +39,7 @@ def find_neighbors(grid: Dict[Coord, int], coord: Coord) -> Set[Coord]:
     Get adjacent coordinates including ones that are diagonally adjacent.
     """
     x, y = coord
-    return {Coord(_x, _y) for (_x, _y) in ((x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1), (x, y-1), (x, y+1), (x-1, y), (x+1, y)) if (_x, _y) in grid}
+    return {Coord(_x, _y) for _x in range(x-1, x+2) for _y in range(y-1, y+2) if (_x, _y) in grid and coord != (_x, _y)}
 
 
 def next_step(grid: Dict[Coord, int]) -> Dict[Coord, int]:
@@ -90,7 +79,7 @@ def test_print(grid: Dict[Coord, int]) -> None:
 
 if __name__ == '__main__':
     # Part 1
-    grid = parse_energy_levels(lines)
+    grid = read_energy_levels()
     flashes = 0
     for i in range(100):
         grid, flashed = next_step(grid)
@@ -101,7 +90,7 @@ if __name__ == '__main__':
     print(f'Part 1: flashed {flashes} times')
 
     # Part 2
-    grid = parse_energy_levels(lines)
+    grid = read_energy_levels()
     for i in range(1, 1_000):
         grid, flashed = next_step(grid)
         if all(value == 0 for value in grid.values()):
