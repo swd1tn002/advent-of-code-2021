@@ -46,6 +46,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * enumerate
 
-* Day 10
+* Days 10 and 11
 
     * regular expressions
+    * using a dict with coordinates to represent two dimensional maps
