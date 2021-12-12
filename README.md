@@ -50,3 +50,8 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * regular expressions
     * using a dict with coordinates to represent two dimensional maps
+
+* Day 12
+
+    * Classes and objects
+    * `__str__` and `__repr__`
