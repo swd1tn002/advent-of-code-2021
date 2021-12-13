@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Set
 from collections import namedtuple
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -17,7 +17,7 @@ def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
         return file.read().split('\n')
 
 
-def parse_points(lines: List[str]) -> List[Point]:
+def parse_points(lines: List[str]) -> Set[Point]:
     """
     The transparent paper is marked with random dots and includes
     instructions on how to fold it up (your puzzle input).
@@ -99,14 +99,15 @@ def print_points(points: List[Point]):
 
 
 if __name__ == '__main__':
-    data = read_puzzle_input()
-    points = parse_points(data)
-    folds = parse_folds(data)
+    data: List[str] = read_puzzle_input()
+
+    points: Set[Point] = parse_points(data)
+    folds: List[Fold] = parse_folds(data)
 
     # Part 1
-    first_fold = folds[0]
+    first_fold: Fold = folds[0]
     part1 = {apply_fold(point, first_fold) for point in points}
-    print(f'Part 1: {len(part1)}')
+    print(f'Part 1: {len(part1)} points')
 
     # Part 2
     for fold in folds:
