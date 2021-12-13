@@ -10,8 +10,8 @@ Fold = namedtuple('Fold', 'axis position')
 
 def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
     """
-    Each octopus has an energy level - your submarine can remotely measure 
-    the energy level of each octopus (your puzzle input)
+    It's a large sheet of transparent paper! The transparent paper is marked with 
+    random dots and includes instructions on how to fold it up (your puzzle input).
     """
     with open(filename) as file:
         return file.read().split('\n')
