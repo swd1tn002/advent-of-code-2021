@@ -24,7 +24,7 @@ def parse_points(lines: List[str]) -> List[Point]:
     The first section is a list of dots on the transparent paper. 
     0,0 represents the top-left coordinate.
     """
-    return {_parse_point(l) for l in lines if 'fold' not in l and l != ''}
+    return {_parse_point(line) for line in lines if 'fold' not in line and line != ''}
 
 
 def _parse_point(line: str) -> Point:
@@ -38,10 +38,13 @@ def parse_folds(lines: List[str]) -> List[Fold]:
     line on the transparent paper and wants you to fold the paper up
     (for horizontal y=... lines) or left (for vertical x=... lines).
     """
-    return [_parse_fold(l) for l in lines if 'fold' in l]
+    return [_parse_fold(line) for line in lines if 'fold' in line]
 
 
 def _parse_fold(line: str) -> Fold:
+    """
+    Converts "fold along x=40" or "fold along y=27" to matching Fold object
+    """
     axis, position = line.replace('fold along ', '').split('=')
     return Fold(axis, int(position))
 
