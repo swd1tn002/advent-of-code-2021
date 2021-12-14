@@ -10,7 +10,7 @@ Fold = namedtuple('Fold', 'axis position')
 
 def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
     """
-    It's a large sheet of transparent paper! The transparent paper is marked with 
+    It's a large sheet of transparent paper! The transparent paper is marked with
     random dots and includes instructions on how to fold it up (your puzzle input).
     """
     with open(filename) as file:
@@ -21,7 +21,7 @@ def parse_points(lines: List[str]) -> Set[Point]:
     """
     The transparent paper is marked with random dots and includes
     instructions on how to fold it up (your puzzle input).
-    The first section is a list of dots on the transparent paper. 
+    The first section is a list of dots on the transparent paper.
     0,0 represents the top-left coordinate.
     """
     return {_parse_point(line) for line in lines if 'fold' not in line and line != ''}
@@ -60,24 +60,27 @@ def apply_fold(point: Point, fold: Fold) -> Point:
         return fold_up(point, fold.position)
 
 
-def fold_left(point: Point, x: int):
+def fold_left(point: Point, fold_x: int):
     """
     Folds the given point to the left, if it is on the right side of the fold  line.
     """
-    if point.x <= x:
+    diff = point.x - fold_x
+
+    if diff < 0:
         return point
     else:
-        return Point(x-(point.x - x), point.y)
+        return Point(fold_x - diff, point.y)
 
 
-def fold_up(point: Point, y: int):
+def fold_up(point: Point, fold_y: int):
     """
     Folds the given point up, if it is below the fold line.
     """
-    if point.y <= y:
+    diff = point.y - fold_y
+    if diff < 0:
         return point
     else:
-        return Point(point.x, y - (point.y - y))
+        return Point(point.x, fold_y - diff)
 
 
 def print_points(points: List[Point]):
