@@ -1,153 +1,92 @@
 from typing import Tuple, Dict, List
+import os
 
-data = """NNCB
-
-CH -> B
-HH -> N
-CB -> H
-NH -> C
-HB -> C
-HC -> B
-HN -> C
-NN -> C
-BH -> H
-NC -> B
-NB -> B
-BN -> B
-BB -> N
-BC -> B
-CC -> N
-CN -> C"""
-
-data = """SCVHKHVSHPVCNBKBPVHV
-
-SB -> B
-HH -> P
-VF -> N
-BS -> S
-NC -> C
-BF -> H
-BN -> H
-SP -> H
-BK -> H
-FF -> N
-VN -> B
-FN -> C
-FS -> S
-PP -> F
-ON -> H
-FV -> F
-KO -> F
-PK -> H
-VB -> S
-HS -> B
-NV -> O
-PN -> S
-VH -> B
-OS -> P
-BP -> H
-OV -> B
-HK -> S
-NN -> K
-SV -> C
-PB -> F
-SK -> F
-FB -> S
-NB -> K
-HF -> P
-FK -> K
-KV -> P
-PV -> F
-BC -> S
-FO -> N
-HC -> F
-CP -> B
-KK -> F
-PC -> S
-HN -> O
-SH -> H
-CK -> P
-CO -> F
-HP -> K
-PS -> C
-KP -> F
-OF -> K
-KS -> F
-NO -> V
-CB -> K
-NF -> N
-SF -> F
-SC -> P
-FC -> V
-BV -> B
-SS -> O
-KC -> K
-FH -> C
-OP -> C
-CF -> K
-VO -> V
-VK -> H
-KH -> O
-NP -> V
-NH -> O
-NS -> V
-BH -> C
-CH -> S
-CC -> F
-CS -> P
-SN -> F
-BO -> S
-NK -> S
-OO -> P
-VV -> F
-FP -> V
-OK -> C
-SO -> H
-KN -> P
-HO -> O
-PO -> H
-VS -> N
-PF -> N
-CV -> F
-BB -> H
-VC -> H
-HV -> B
-CN -> S
-OH -> K
-KF -> K
-HB -> S
-OC -> H
-KB -> P
-OB -> C
-VP -> C
-PH -> K"""
-
-lines = data.split('\n')
-polymer_template = lines[0]
+INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 
-def line_to_tuple(line: str) -> Tuple:
-    left, right = line.split(' -> ')
-    return (left[0], left[1]), right
+def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
+    """
+    The submarine manual contains instructions for finding the optimal polymer formula;
+    specifically, it offers a polymer template and a list of pair insertion rules (your puzzle input).
+
+    Returns a tuple with the polymer template and the list of rules
+    """
+    with open(filename) as file:
+        lines = file.read().split('\n')
+
+    return lines[0], lines[2:]
 
 
-rules = dict((line_to_tuple(line)) for line in lines[2:])
-
-print(rules)
-
-
-def grow_polymer(poly_template: str, rules: Dict[Tuple, str]) -> str:
-    pairs = zip(poly_template, poly_template[1:])
-    insertions: List[str] = [char_pair[0] + rules[char_pair]
-                             for char_pair in pairs] + [poly_template[-1]]
-    return ''.join(insertions)
+def generate_insertion_rules(rule_lines: List[str]) -> Dict[str, str]:
+    return dict((parse_insertion_rule(line)) for line in rule_lines)
 
 
-for i in range(10):
-    print(i)
-    polymer_template = grow_polymer(polymer_template, rules)
+def parse_insertion_rule(line: str) -> Tuple[str, str]:
+    """
+    A rule like AB -> C means that when elements A and B are immediately adjacent,
+    element C should be inserted between them. These insertions all happen simultaneously.
 
-print(polymer_template)
+    This method parses a signle rule and returns the pair and the insertion char.
+    """
+    pair, insertion = line.split(' -> ')
+    return pair, insertion
 
-counts = {ch: polymer_template.count(ch) for ch in rules.values()}
-print(max(counts.values()) - min(counts.values()))
+
+def count_next_step_pairs(pairs_and_counts: Dict[str, int], insertion_rules: Dict[str, str]) -> Dict[str, int]:
+    """
+    Note that these pairs overlap: the second element of one pair is the first element of the next pair.
+    Also, because all pairs are considered simultaneously, inserted elements are not considered to be part
+    of a pair until the next step.
+    """
+    new_counts = {pair: 0 for pair in insertion_rules.keys()}
+
+    for pair, count in pairs_and_counts.items():
+        insert_char = insertion_rules[pair]
+        new_counts[pair[0] + insert_char] += count
+        new_counts[insert_char + pair[1]] += count
+
+    return new_counts
+
+
+def count_first_chars(pairs_and_counts: Dict[str, int], original_template: str) -> Dict[str, int]:
+    char_counts = {c: 0 for c in insertion_rules.values()}
+
+    # To count each character only once, we only take the first character of each pair
+    for pair, count in pair_counts.items():
+        char_counts[pair[0]] += count
+
+    # The last character in the polymer does not appear as the first of any pair,
+    # so it needs to be incremented manually
+    char_counts[polymer_template[-1]] += 1
+
+    return char_counts
+
+
+if __name__ == '__main__':
+    polymer_template, rule_lines = read_puzzle_input()
+    insertion_rules = generate_insertion_rules(rule_lines)
+
+    # Initialize a pair count dict with counts from the initial polymer template
+    pair_counts = {
+        pair: polymer_template.count(pair) for pair in insertion_rules.keys()
+    }
+
+    # Part 1
+    for i in range(10):
+        pair_counts = count_next_step_pairs(pair_counts, insertion_rules)
+
+    # What do you get if you take the quantity of the most common element and subtract
+    # the quantity of the least common element?
+    counts_1 = count_first_chars(pair_counts, polymer_template)
+
+    # 2712
+    print(f'Part 1: {max(counts_1.values()) - min(counts_1.values())}')
+
+    # Part 2, do 30 more steps
+    for i in range(30):
+        pair_counts = count_next_step_pairs(pair_counts, insertion_rules)
+
+    counts_2 = count_first_chars(pair_counts, polymer_template)
+
+    # 8336623059567
+    print(f'Part 2: {max(counts_2.values()) - min(counts_2.values())}')
