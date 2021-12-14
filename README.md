@@ -55,3 +55,11 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * Classes and objects
     * `__str__` and `__repr__`
+
+* Day 13
+
+    * Thinking in terms sets of coordinates and not two dimensional structures
+
+* Day 14
+
+    * First puzzle that I could not solve alone. Found a hint for part 2 from Koodiklinikka.
