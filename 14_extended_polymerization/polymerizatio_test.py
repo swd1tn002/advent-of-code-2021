@@ -49,6 +49,6 @@ def test_count_first_chars():
     counts = count_first_chars(pairs, 'ABBA')
 
     assert counts == {
-        'A': 2_501,
+        'A': 2_501,  # Also has one extra 'A' because it's the last char from the template
         'B': 500
     }
