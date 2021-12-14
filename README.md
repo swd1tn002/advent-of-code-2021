@@ -58,8 +58,9 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
 * Day 13
 
-    * Thinking in terms sets of coordinates and not two dimensional structures
+    * Thinking in terms of sets of coordinates and not two dimensional structures
 
 * Day 14
 
     * First puzzle that I could not solve alone. Found a hint for part 2 from Koodiklinikka.
+    * Using Counter to streamline counting character values

@@ -1,4 +1,5 @@
 from typing import Tuple, Dict, List
+from collections import Counter
 import os
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -36,13 +37,13 @@ def parse_insertion_rule(line: str) -> Tuple[str, str]:
     return pair, insertion
 
 
-def count_next_step_pairs(pairs_and_counts: Dict[str, int], insertion_rules: Dict[str, str]) -> Dict[str, int]:
+def count_next_step_pairs(pairs_and_counts: Counter, insertion_rules: Dict[str, str]) -> Counter[str, int]:
     """
     Note that these pairs overlap: the second element of one pair is the first element of the next pair.
     Also, because all pairs are considered simultaneously, inserted elements are not considered to be part
     of a pair until the next step.
     """
-    new_counts = {pair: 0 for pair in insertion_rules.keys()}
+    new_counts = Counter()
 
     for pair, count in pairs_and_counts.items():
         insert_char = insertion_rules[pair]
@@ -52,12 +53,13 @@ def count_next_step_pairs(pairs_and_counts: Dict[str, int], insertion_rules: Dic
     return new_counts
 
 
-def count_first_chars(pair_counts: Dict[str, int], polymer_template: str) -> Dict[str, int]:
-    char_counts = {c: 0 for pair in pair_counts.keys() for c in pair}
+def count_first_chars(pair_counts: Counter[str, int], polymer_template: str) -> Counter[str, int]:
+    char_counts = Counter()
 
-    # To count each character only once, we only take the first character of each pair
     for pair, count in pair_counts.items():
-        char_counts[pair[0]] += count
+        # To count each character only once, we only take the first character of each pair
+        char = pair[0]
+        char_counts[char] += count
 
     # The last character in the polymer does not appear as the first of any pair,
     # so it needs to be incremented manually
@@ -71,9 +73,9 @@ if __name__ == '__main__':
     insertion_rules = generate_insertion_rules(rule_lines)
 
     # Initialize a pair count dict with counts from the initial polymer template
-    pair_counts = {
+    pair_counts = Counter({
         pair: polymer_template.count(pair) for pair in insertion_rules.keys()
-    }
+    })
 
     # Part 1
     for i in range(10):
