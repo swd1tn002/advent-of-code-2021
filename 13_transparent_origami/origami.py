@@ -65,7 +65,6 @@ def fold_left(point: Point, fold_x: int):
     Folds the given point to the left, if it is on the right side of the fold  line.
     """
     diff = point.x - fold_x
-
     if diff < 0:
         return point
     else:
