@@ -48,8 +48,8 @@ def count_next_step_pairs(pairs_and_counts: Dict[str, int], insertion_rules: Dic
     return new_counts
 
 
-def count_first_chars(pairs_and_counts: Dict[str, int], original_template: str) -> Dict[str, int]:
-    char_counts = {c: 0 for c in insertion_rules.values()}
+def count_first_chars(pair_counts: Dict[str, int], polymer_template: str) -> Dict[str, int]:
+    char_counts = {c: 0 for pair in pair_counts.keys() for c in pair}
 
     # To count each character only once, we only take the first character of each pair
     for pair, count in pair_counts.items():
