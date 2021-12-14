@@ -18,6 +18,10 @@ def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
 
 
 def generate_insertion_rules(rule_lines: List[str]) -> Dict[str, str]:
+    """
+    Goes through pair insertion rules and creates a dict with pairs and insertions: 
+    [ "AB -> C", "BA" -> "D" ] => { "AB": "C", "BA": "D" }
+    """
     return dict((parse_insertion_rule(line)) for line in rule_lines)
 
 
