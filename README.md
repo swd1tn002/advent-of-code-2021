@@ -64,3 +64,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * First puzzle that I could not solve alone. Found a hint for part 2 from Koodiklinikka.
     * Using Counter to streamline counting character values
+
+* Day 15
+
+    * Using Dijkstra's Algorithm to find minimum travel cost between two points

@@ -45,8 +45,9 @@ def find_neighbors(grid: Grid, coord: Coord) -> Set[Coord]:
     return {Coord(_x, _y) for _x, _y in neighbors if (_x, _y) in grid and coord != (_x, _y)}
 
 
+# Dijkstra's Algorithm
 # https://stackabuse.com/dijkstras-algorithm-in-python/
-def dijkstra(grid: Grid) -> Grid:
+def find_lowest_risks(grid: Grid) -> Grid:
     """
     You start in the top left position, your destination is the bottom right position, and you cannot 
     move diagonally. The number at each position is its risk level; to determine the total risk of an
@@ -139,7 +140,7 @@ if __name__ == '__main__':
     print_grid(grid)
 
     # Part 1:
-    lowest_risk_paths = dijkstra(grid)
+    lowest_risk_paths = find_lowest_risks(grid)
 
     w1 = max(c.x for c in grid.keys())
     h2 = max(c.y for c in grid.keys())
@@ -147,7 +148,7 @@ if __name__ == '__main__':
 
     # Part 2:
     expanded = expand_grid(grid, 5)
-    lowest_expanded_risks = dijkstra(expanded)
+    lowest_expanded_risks = find_lowest_risks(expanded)
 
     w2 = max(c.x for c in expanded.keys())
     h2 = max(c.y for c in expanded.keys())
