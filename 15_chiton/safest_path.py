@@ -47,6 +47,11 @@ def find_neighbors(grid: Grid, coord: Coord) -> Set[Coord]:
 
 # https://stackabuse.com/dijkstras-algorithm-in-python/
 def dijkstra(grid: Grid) -> Grid:
+    """
+    You start in the top left position, your destination is the bottom right position, and you cannot 
+    move diagonally. The number at each position is its risk level; to determine the total risk of an
+    entire path, add up the risk levels of each position you enter.
+    """
     start = Coord(0, 0)
 
     risk_levels = {**{coord: sys.maxsize for coord in grid.keys()},
@@ -86,36 +91,46 @@ def print_grid(grid: Grid) -> None:
 
 
 def expand_grid(grid: Grid, scale: int) -> Grid:
-    return expand_grid_horizontal(expand_grid_vertical(grid, scale), scale)
+    """
+    The entire cave is actually five times larger in both dimensions than you thought;
+    the area you originally scanned is just one tile in a 5x5 tile area that forms the
+    full map. Your original map tile repeats to the right and downward; each time the
+    tile repeats to the right or downward, all of its risk levels are 1 higher than the
+    tile immediately up or left of it.
+    """
+    vertically_expanded = _expand_vertical(grid, scale)
+    return _expand_horizontal(vertically_expanded, scale)
 
 
-def expand_grid_horizontal(grid: Grid, scale: int) -> Grid:
+def _expand_horizontal(grid: Grid, scale: int) -> Grid:
     width = max(c.x for c in grid.keys()) + 1
     new_grid = {}
 
-    for i in range(scale):
-        offset_x = i * width
-        for coord in grid.keys():
+    for coord in grid.keys():
+        for i in range(scale):
+            offset_x = i * width
             new_coord = Coord(coord.x + offset_x, coord.y)
-            new_risk = grid[coord] + i
-            new_grid[new_coord] = new_risk if new_risk <= 9 else 1 + \
-                new_risk % 10
+            new_grid[new_coord] = risk_to_range(grid[coord] + i)
     return new_grid
 
 
-def expand_grid_vertical(grid: Grid, scale: int) -> Grid:
+def _expand_vertical(grid: Grid, scale: int) -> Grid:
     height = max(c.y for c in grid.keys()) + 1
     new_grid = {}
 
-    # vertical copies
-    for i in range(scale):
-        offset_y = i * height
-        for coord in grid.keys():
+    for coord in grid.keys():
+        for i in range(scale):
+            offset_y = i * height
             new_coord = Coord(coord.x, coord.y + offset_y)
-            new_risk = grid[coord] + i
-            new_grid[new_coord] = new_risk if new_risk <= 9 else 1 + \
-                new_risk % 10
+            new_grid[new_coord] = risk_to_range(grid[coord] + i)
     return new_grid
+
+
+def risk_to_range(risk: int) -> int:
+    """
+    Risk levels above 9 wrap back around to 1.
+    """
+    return risk if risk <= 9 else 1 + risk % 10
 
 
 if __name__ == '__main__':
@@ -125,7 +140,6 @@ if __name__ == '__main__':
 
     # Part 1:
     lowest_risk_paths = dijkstra(grid)
-    # print_grid(lowest_risk_paths)
 
     w1 = max(c.x for c in grid.keys())
     h2 = max(c.y for c in grid.keys())
@@ -133,7 +147,6 @@ if __name__ == '__main__':
 
     # Part 2:
     expanded = expand_grid(grid, 5)
-    print_grid(expanded)
     lowest_expanded_risks = dijkstra(expanded)
 
     w2 = max(c.x for c in expanded.keys())
