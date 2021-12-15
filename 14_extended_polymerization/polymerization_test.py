@@ -17,7 +17,7 @@ def test_parse_insertion_rule():
     assert insertion == 'C'
 
 
-def test_count_next_step_pairs():
+def test_count_next_step():
     start = {
         'AB': 2,
         'BC': 3,
@@ -30,7 +30,7 @@ def test_count_next_step_pairs():
         'AA': 'A',
         'BB': 'B'
     }
-    next_step = count_next_step_pairs(start, rules)
+    next_step = count_next_step(start, rules)
 
     assert next_step == {
         'AB': 2,
@@ -40,13 +40,13 @@ def test_count_next_step_pairs():
     }
 
 
-def test_count_first_chars():
+def test_count_chars():
     pairs = {
         'AB': 1_000,
         'AA': 1_500,
         'BA': 500
     }
-    counts = count_first_chars(pairs, 'ABBA')
+    counts = count_chars(pairs, 'ABBA')
 
     assert counts == {
         'A': 2_501,  # Also has one extra 'A' because it's the last char from the template

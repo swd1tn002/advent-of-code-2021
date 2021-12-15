@@ -37,7 +37,7 @@ def parse_insertion_rule(line: str) -> Tuple[str, str]:
     return pair, insertion
 
 
-def count_next_step_pairs(pairs_and_counts: Counter, insertion_rules: Dict[str, str]) -> Counter[str, int]:
+def count_next_step(pairs_and_counts: Counter, insertion_rules: Dict[str, str]) -> Counter[str, int]:
     """
     Note that these pairs overlap: the second element of one pair is the first element of the next pair.
     Also, because all pairs are considered simultaneously, inserted elements are not considered to be part
@@ -53,17 +53,16 @@ def count_next_step_pairs(pairs_and_counts: Counter, insertion_rules: Dict[str, 
     return new_counts
 
 
-def count_first_chars(pair_counts: Counter[str, int], polymer_template: str) -> Counter[str, int]:
-    char_counts = Counter()
-
-    for pair, count in pair_counts.items():
-        # To count each character only once, we only take the first character of each pair
-        char = pair[0]
-        char_counts[char] += count
-
+def count_chars(pair_counts: Counter[str, int], polymer_template: str) -> Counter[str, int]:
     # The last character in the polymer does not appear as the first of any pair,
     # so it needs to be incremented manually
-    char_counts[polymer_template[-1]] += 1
+    char_counts = Counter({polymer_template[-1]: 1})
+
+    for pair, count in pair_counts.items():
+        # Each individual cahracter appears twice: as the first and the last of a pair.
+        # To count each character only once, we only take the first character of each pair.
+        char = pair[0]
+        char_counts[char] += count
 
     return char_counts
 
@@ -79,20 +78,20 @@ if __name__ == '__main__':
 
     # Part 1
     for i in range(10):
-        pair_counts = count_next_step_pairs(pair_counts, insertion_rules)
+        pair_counts = count_next_step(pair_counts, insertion_rules)
 
     # What do you get if you take the quantity of the most common element and subtract
     # the quantity of the least common element?
-    counts_1 = count_first_chars(pair_counts, polymer_template)
+    counts_1 = count_chars(pair_counts, polymer_template)
 
     # 2712
     print(f'Part 1: {max(counts_1.values()) - min(counts_1.values())}')
 
     # Part 2, do 30 more steps
     for i in range(30):
-        pair_counts = count_next_step_pairs(pair_counts, insertion_rules)
+        pair_counts = count_next_step(pair_counts, insertion_rules)
 
-    counts_2 = count_first_chars(pair_counts, polymer_template)
+    counts_2 = count_chars(pair_counts, polymer_template)
 
     # 8336623059567
     print(f'Part 2: {max(counts_2.values()) - min(counts_2.values())}')
