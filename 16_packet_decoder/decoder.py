@@ -11,17 +11,18 @@ class Packet:
         self.version = int(bytes[:3], 2)
 
         self.bytes = bytes
+        self.sub_packets = self._sub_packets()
 
     def __repr__(self):
         return self.bytes[:10]
 
     def __eq__(self, __o: object) -> bool:
-        return type(self) == type(__o) and self.sub_packets() == __o.sub_packets()
+        return type(self) == type(__o) and self.sub_packets == __o._sub_packets
 
     def calculate(self) -> int:
         raise Exception('Must be implemented in subclass')
 
-    def sub_packets(self) -> List['Packet']:
+    def _sub_packets(self) -> List['Packet']:
         raise Exception('Must be implemented in subclass')
 
     @staticmethod
@@ -33,9 +34,9 @@ class Packet:
 
 class Operator(Packet):
     def sub_values(self) -> List[int]:
-        return [v.calculate() for v in self.sub_packets()]
+        return [v.calculate() for v in self.sub_packets]
 
-    def sub_packets(self) -> List['Packet']:
+    def _sub_packets(self) -> List['Packet']:
         payload = self.payload()
         packets = []
         if self.length_type() == 'bits':
@@ -52,7 +53,7 @@ class Operator(Packet):
         return packets
 
     def __len__(self) -> int:
-        return 7 + self.size_header_length() + sum(len(x) for x in self.sub_packets())
+        return 7 + self.size_header_length() + sum(len(x) for x in self.sub_packets)
 
     def subpacket_size(self) -> str:
         start = 7
@@ -115,7 +116,7 @@ class Literal(Packet):
             if prefix == '0':
                 return
 
-    def sub_packets(self) -> List['Packet']:
+    def _sub_packets(self) -> List['Packet']:
         return []
 
     def __eq__(self, __o: object) -> bool:
@@ -124,13 +125,13 @@ class Literal(Packet):
 
 class Sum(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets()]
+        sub_values = [v.calculate() for v in self.sub_packets]
         return sum(self.sub_values())
 
 
 class Product(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets()]
+        sub_values = [v.calculate() for v in self.sub_packets]
         product = 1
         for v in sub_values:
             product *= v
@@ -139,13 +140,13 @@ class Product(Operator):
 
 class Min(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets()]
+        sub_values = [v.calculate() for v in self.sub_packets]
         return min(self.sub_values())
 
 
 class Max(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets()]
+        sub_values = [v.calculate() for v in self.sub_packets]
         return max(self.sub_values())
 
 
@@ -186,7 +187,7 @@ def hex2bin(hex: str) -> str:
 
 
 def sum_of_versions(packet: Packet) -> int:
-    return packet.version + sum(sum_of_versions(sub) for sub in packet.sub_packets())
+    return packet.version + sum(sum_of_versions(sub) for sub in packet.sub_packets)
 
 
 if __name__ == '__main__':

@@ -32,7 +32,7 @@ def test_sub_packets():
     packet = Packet.parse(
         '00111000000000000110111101000101001010010001001000000000')
 
-    assert packet.sub_packets() == [Packet.parse(
+    assert packet.sub_packets == [Packet.parse(
         '11010001010'), Packet.parse('0101001000100100')]
 
     assert type(packet) == Lower
