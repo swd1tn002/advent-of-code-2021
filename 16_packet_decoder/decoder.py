@@ -18,9 +18,6 @@ class Packet:
     def __eq__(self, __o: object) -> bool:
         return type(self) == type(__o) and self.sub_packets() == __o.sub_packets()
 
-    def length(self) -> int:
-        raise Exception('Must be implemented in subclass')
-
     def calculate(self) -> int:
         raise Exception('Must be implemented in subclass')
 
@@ -40,59 +37,50 @@ class Operator(Packet):
 
     def sub_packets(self) -> List['Packet']:
         payload = self.payload()
-        if self.length_type_id() == '0':
-            packets = []
+        packets = []
+        if self.length_type() == 'bits':
             while payload != '':
                 sub = Packet.parse(payload)
                 packets.append(sub)
-                payload = payload[sub.length():]
-            return packets
+                payload = payload[len(sub):]
         else:
-            packets = []
             for i in range(self.subpacket_size()):
                 sub = Packet.parse(payload)
                 packets.append(sub)
-                payload = payload[sub.length():]
+                payload = payload[len(sub):]
 
-            return packets
+        return packets
 
-    def length(self) -> int:
-        return 7 + self.size_header_length() + sum(x.length() for x in self.sub_packets())
+    def __len__(self) -> int:
+        return 7 + self.size_header_length() + sum(len(x) for x in self.sub_packets())
 
     def subpacket_size(self) -> str:
         start = 7
-        end = 7 + (15 if self.length_type_id() == '0' else 11)
+        end = start + self.size_header_length()
         return int(self.bytes[start: end], 2)
 
     def payload(self) -> str:
+        start = 7 + self.size_header_length()
         if self.length_type() == 'bits':
-            """
-            If the length type ID is 0, then the next 15 bits are a number that represents the total length
-            in bits of the sub-packets contained by this packet.
-            """
-            start = 7 + 15
-            size = int(self.bytes[7:7+15], 2)
+            size_binary = self.bytes[7:7+15]
+            size = int(size_binary, 2)
             return self.bytes[start: start + size]
         else:
-            """
-            If the length type ID is 1, then the next 11 bits are a number that represents the number of
-            sub-packets immediately contained by this packet.
-            """
             return self.bytes[7 + 11:]
 
     def size_header_length(self):
-        """
-        If the length type ID is 0, then the next 15 bits are a number that represents the total length
-        in bits of the sub-packets contained by this packet.
-        If the length type ID is 1, then the next 11 bits are a number that represents the number of
-        sub-packets immediately contained by this packet.
-        """
-        return 11 if self.length_type_id() == '1' else 15
-
-    def length_type_id(self) -> str:
-        return self.bytes[6]
+        return 15 if self.length_type() == 'bits' else 11
 
     def length_type(self) -> str:
+        """
+        If the length type ID is 0, then the next 15 bits are a number
+        that represents the total length in bits of the sub-packets
+        contained by this packet. If the length type ID is 1, then the 
+        next 11 bits are a number that represents the number of sub-packets 
+        immediately contained by this packet.
+
+        Returns either 'bits' or 'packets' depending on the value
+        """
         return 'bits' if self.bytes[6] == '0' else 'packets'
 
 
@@ -110,7 +98,7 @@ class Literal(Packet):
         """
         return self.bytes[6:]
 
-    def length(self) -> int:
+    def __len__(self) -> int:
         headers = 6
         return headers + sum(1 + len(c) for c in self.groups())
 
@@ -207,7 +195,7 @@ if __name__ == '__main__':
     # Part 1
     version_sum = 0
     root = Packet.parse(bytes)
-    print(f'Part 1: sum of version: {sum_of_versions(root)}')
+    print(f'Part 1: sum of versions is {sum_of_versions(root)}')
 
     # Part 2
-    print(f'Part 2: calculated value: {root.calculate()}')
+    print(f'Part 2: calculated value is {root.calculate()}')

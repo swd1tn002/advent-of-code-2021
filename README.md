@@ -68,3 +68,10 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * Day 15
 
     * Using Dijkstra's Algorithm to find minimum travel cost between two points
+
+* Day 16
+
+    * Object oriented programming
+    * Superclasses and subclasses
+    * Overriding `__len__` and `__eq__`
+    * Creating generator functions with `yield` keyword

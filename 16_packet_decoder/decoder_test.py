@@ -42,7 +42,7 @@ def test_literal_package_length():
     # padded with 3 zeros on the right
     literal = Packet.parse('110100101111111000101000')
 
-    assert literal.length() == 21
+    assert len(literal) == 21
 
 
 def test_operator_package_length():
@@ -51,7 +51,7 @@ def test_operator_package_length():
         '00111000000000000110111101000101001010010001001000000000')
 
     assert operator.size_header_length() == 15
-    assert operator.length() == 49
+    assert len(operator) == 49
 
 
 def test_sum_of_versions_8A004A801A8002F478():
