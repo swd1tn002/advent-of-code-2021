@@ -15,35 +15,38 @@ def test_hex2bin_input():
 
 
 def test_packet_version_and_type():
-    packet = Packet('110100101111111000101000')
+    packet = Packet.parse('110100101111111000101000')
 
-    assert packet.version() == 6
-    assert packet.type_id() == 4
+    assert packet.version == 6
+    assert type(packet) == Literal
 
 
 def test_literal_value():
-    packet = Packet('110100101111111000101000')
+    packet = Packet.parse('110100101111111000101000')
 
-    assert packet.literal_value() == 2021
+    assert packet.calculate() == 2021
 
 
 def test_sub_packets():
-    packet = Packet('00111000000000000110111101000101001010010001001000000000')
+    packet = Packet.parse(
+        '00111000000000000110111101000101001010010001001000000000')
 
-    assert packet.sub_packets() == [Packet(
-        '11010001010'), Packet('0101001000100100')]
+    assert packet.sub_packets() == [Packet.parse(
+        '11010001010'), Packet.parse('0101001000100100')]
+
+    assert type(packet) == Lower
 
 
 def test_literal_package_length():
     # padded with 3 zeros on the right
-    literal = Packet('110100101111111000101000')
+    literal = Packet.parse('110100101111111000101000')
 
     assert literal.length() == 21
 
 
 def test_operator_package_length():
 
-    operator = Packet(
+    operator = Packet.parse(
         '00111000000000000110111101000101001010010001001000000000')
 
     assert operator.size_header_length() == 15
@@ -52,18 +55,18 @@ def test_operator_package_length():
 
 
 def test_sum_of_versions_8A004A801A8002F478():
-    packet = Packet(hex2bin('8A004A801A8002F478'))
+    packet = Packet.parse(hex2bin('8A004A801A8002F478'))
 
     assert sum_of_versions(packet) == 16
 
 
 def test_sum_of_versions_C0015000016115A2E0802F182340():
-    packet = Packet(hex2bin('C0015000016115A2E0802F182340'))
+    packet = Packet.parse(hex2bin('C0015000016115A2E0802F182340'))
 
     assert sum_of_versions(packet) == 23
 
 
 def test_sum_of_versions_A0016C880162017C3686B18A3D4780():
-    packet = Packet(hex2bin('A0016C880162017C3686B18A3D4780'))
+    packet = Packet.parse(hex2bin('A0016C880162017C3686B18A3D4780'))
 
     assert sum_of_versions(packet) == 31
