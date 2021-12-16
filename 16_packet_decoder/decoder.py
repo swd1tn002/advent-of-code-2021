@@ -39,14 +39,11 @@ class Operator(Packet):
         return [v.calculate() for v in self.sub_packets()]
 
     def sub_packets(self) -> List['Packet']:
-        length_type_id = self.bytes[6]
-
-        if length_type_id == '0':
+        if self.length_type_id() == '0':
             """
             If the length type ID is 0, then the next 15 bits are a
             number that represents the total length in bits of the
             sub-packets contained by this packet.
-
             """
             payload_length = int(self.bytes[7: 7 + 15], 2)
             payload = self.bytes[7 + 15: 7 + 15 + payload_length]
@@ -60,7 +57,7 @@ class Operator(Packet):
             payload = self.bytes[7 + 11:]
 
         packets = []
-        while len(payload) > 3 and sub_count > 0:
+        while payload != '' and sub_count > 0:
             sub = Packet.parse(payload)
             packets.append(sub)
             payload = payload[sub.length():]
@@ -71,9 +68,17 @@ class Operator(Packet):
     def length(self) -> int:
         return 7 + self.size_header_length() + sum(x.length() for x in self.sub_packets())
 
+    def length_type_id(self):
+        return self.bytes[6]
+
     def size_header_length(self):
-        # operator packages only
-        return 11 if self.bytes[6] == '1' else 15
+        """
+        If the length type ID is 0, then the next 15 bits are a number that represents the total length
+        in bits of the sub-packets contained by this packet.
+        If the length type ID is 1, then the next 11 bits are a number that represents the number of 
+        sub-packets immediately contained by this packet.
+        """
+        return 11 if self.length_type_id() == '1' else 15
 
     def sub_packet_length(self):
         # operator packages only
@@ -91,9 +96,9 @@ class Literal(Packet):
         literal = ''
         while True:
             literal += self.bytes[prefix_index+1: prefix_index+5]
+            # Each group is prefixed by a 1 bit except the last group,
+            # which is prefixed by a 0 bit.
             if self.bytes[prefix_index] == '1':
-                # Each group is prefixed by a 1 bit except the last group,
-                # which is prefixed by a 0 bit.
                 prefix_index += 5
             else:
                 break
