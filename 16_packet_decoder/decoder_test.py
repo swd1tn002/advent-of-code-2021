@@ -50,7 +50,7 @@ def test_operator_package_length():
     operator = Packet.parse(
         '00111000000000000110111101000101001010010001001000000000')
 
-    assert operator.size_header_length() == 15
+    assert operator._size_header_length() == 15
     assert len(operator) == 49
 
 

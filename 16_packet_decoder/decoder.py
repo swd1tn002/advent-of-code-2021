@@ -33,53 +33,65 @@ class Packet:
 
 
 class Operator(Packet):
-    def sub_values(self) -> List[int]:
-        return [v.calculate() for v in self.sub_packets]
+    """
+    An operator performs some calculation on one or more sub-packets
+    contained within.
+
+    An operator packet contains one or more packets. To indicate which subsequent
+    binary data represents its sub-packets, an operator packet can use one of two
+    modes indicated by the bit immediately after the packet header; this is 
+    called the length type ID:
+
+    * If the length type ID is 0, then the next 15 bits are a number that represents
+      the total length in bits of the sub-packets contained by this packet. 
+    * If the length type ID is 1, then the next 11 bits are a number that represents
+      the number of sub-packets immediately contained by this packet.
+    """
 
     def _sub_packets(self) -> List['Packet']:
-        payload = self.payload()
+        payload = self._payload()
         packets = []
-        if self.length_type() == 'bits':
+        if self._length_type() == 'bits':
             while payload != '':
                 sub = Packet.parse(payload)
                 packets.append(sub)
                 payload = payload[len(sub):]
         else:
-            for i in range(self.subpacket_size()):
+            for i in range(self._subpacket_size()):
                 sub = Packet.parse(payload)
                 packets.append(sub)
                 payload = payload[len(sub):]
 
         return packets
 
-    def __len__(self) -> int:
-        return 7 + self.size_header_length() + sum(len(x) for x in self.sub_packets)
+    def sub_values(self) -> List[int]:
+        return [v.calculate() for v in self.sub_packets]
 
-    def subpacket_size(self) -> str:
+    def __len__(self) -> int:
+        """
+        The length of this binary sequence in bits.
+        """
+        return 7 + self._size_header_length() + sum(len(x) for x in self.sub_packets)
+
+    def _subpacket_size(self) -> str:
         start = 7
-        end = start + self.size_header_length()
+        end = start + self._size_header_length()
         return int(self.bytes[start: end], 2)
 
-    def payload(self) -> str:
-        start = 7 + self.size_header_length()
-        if self.length_type() == 'bits':
+    def _payload(self) -> str:
+        start = 7 + self._size_header_length()
+        if self._length_type() == 'bits':
             size_binary = self.bytes[7:7+15]
             size = int(size_binary, 2)
             return self.bytes[start: start + size]
         else:
-            return self.bytes[7 + 11:]
+            return self.bytes[start:]
 
-    def size_header_length(self):
-        return 15 if self.length_type() == 'bits' else 11
+    def _size_header_length(self):
+        return 15 if self._length_type() == 'bits' else 11
 
-    def length_type(self) -> str:
+    def _length_type(self) -> str:
         """
-        If the length type ID is 0, then the next 15 bits are a number
-        that represents the total length in bits of the sub-packets
-        contained by this packet. If the length type ID is 1, then the 
-        next 11 bits are a number that represents the number of sub-packets 
-        immediately contained by this packet.
-
         Returns either 'bits' or 'packets' depending on the value
         """
         return 'bits' if self.bytes[6] == '0' else 'packets'
@@ -100,6 +112,9 @@ class Literal(Packet):
         return self.bytes[6:]
 
     def __len__(self) -> int:
+        """
+        The length of this binary sequence in bits.
+        """
         headers = 6
         return headers + sum(1 + len(c) for c in self.groups())
 
@@ -125,28 +140,24 @@ class Literal(Packet):
 
 class Sum(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets]
         return sum(self.sub_values())
 
 
 class Product(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets]
         product = 1
-        for v in sub_values:
+        for v in self.sub_values():
             product *= v
         return product
 
 
 class Min(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets]
         return min(self.sub_values())
 
 
 class Max(Operator):
     def calculate(self) -> int:
-        sub_values = [v.calculate() for v in self.sub_packets]
         return max(self.sub_values())
 
 
