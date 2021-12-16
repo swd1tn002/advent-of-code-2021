@@ -24,6 +24,7 @@ def test_packet_version_and_type():
 def test_literal_value():
     packet = Packet.parse('110100101111111000101000')
 
+    assert list(packet.groups()) == ['0111', '1110', '0101']
     assert packet.calculate() == 2021
 
 
@@ -50,7 +51,6 @@ def test_operator_package_length():
         '00111000000000000110111101000101001010010001001000000000')
 
     assert operator.size_header_length() == 15
-    assert operator.sub_packet_length() == 27
     assert operator.length() == 49
 
 

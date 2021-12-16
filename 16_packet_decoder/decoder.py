@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 from collections import namedtuple
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -39,51 +39,61 @@ class Operator(Packet):
         return [v.calculate() for v in self.sub_packets()]
 
     def sub_packets(self) -> List['Packet']:
+        payload = self.payload()
         if self.length_type_id() == '0':
-            """
-            If the length type ID is 0, then the next 15 bits are a
-            number that represents the total length in bits of the
-            sub-packets contained by this packet.
-            """
-            payload_length = int(self.bytes[7: 7 + 15], 2)
-            payload = self.bytes[7 + 15: 7 + 15 + payload_length]
-            sub_count = 99999
+            packets = []
+            while payload != '':
+                sub = Packet.parse(payload)
+                packets.append(sub)
+                payload = payload[sub.length():]
+            return packets
         else:
-            """
-            If the length type ID is 1, then the next 11 bits are a
-            number that represents the number of sub-packets immediately contained by this packet.
-            """
-            sub_count = int(self.bytes[7: 7 + 11], 2)
-            payload = self.bytes[7 + 11:]
+            packets = []
+            for i in range(self.subpacket_size()):
+                sub = Packet.parse(payload)
+                packets.append(sub)
+                payload = payload[sub.length():]
 
-        packets = []
-        while payload != '' and sub_count > 0:
-            sub = Packet.parse(payload)
-            packets.append(sub)
-            payload = payload[sub.length():]
-            sub_count -= 1
-
-        return packets
+            return packets
 
     def length(self) -> int:
         return 7 + self.size_header_length() + sum(x.length() for x in self.sub_packets())
 
-    def length_type_id(self):
-        return self.bytes[6]
+    def subpacket_size(self) -> str:
+        start = 7
+        end = 7 + (15 if self.length_type_id() == '0' else 11)
+        return int(self.bytes[start: end], 2)
+
+    def payload(self) -> str:
+        if self.length_type_id() == '0':
+            """
+            If the length type ID is 0, then the next 15 bits are a number that represents the total length
+            in bits of the sub-packets contained by this packet.
+            """
+            start = 7 + 15
+            size = int(self.bytes[7:7+15], 2)
+            return self.bytes[start: start + size]
+        else:
+            """
+            If the length type ID is 1, then the next 11 bits are a number that represents the number of
+            sub-packets immediately contained by this packet.
+            """
+            return self.bytes[7 + 11:]
 
     def size_header_length(self):
         """
         If the length type ID is 0, then the next 15 bits are a number that represents the total length
         in bits of the sub-packets contained by this packet.
-        If the length type ID is 1, then the next 11 bits are a number that represents the number of 
+        If the length type ID is 1, then the next 11 bits are a number that represents the number of
         sub-packets immediately contained by this packet.
         """
         return 11 if self.length_type_id() == '1' else 15
 
-    def sub_packet_length(self):
-        # operator packages only
-        size_bits = self.size_header_length()
-        return int(self.bytes[7: 7+size_bits], 2)
+    def length_type_id(self) -> str:
+        return self.bytes[6]
+
+    def length_type(self) -> str:
+        return 'length' if self.bytes[6] == '1' else 'count'
 
 
 class Literal(Packet):
@@ -92,26 +102,36 @@ class Literal(Packet):
     """
 
     def calculate(self) -> int:
-        prefix_index = 6
-        literal = ''
-        while True:
-            literal += self.bytes[prefix_index+1: prefix_index+5]
-            # Each group is prefixed by a 1 bit except the last group,
-            # which is prefixed by a 0 bit.
-            if self.bytes[prefix_index] == '1':
-                prefix_index += 5
-            else:
-                break
-        return int(literal, 2)
+        return int(''.join(self.groups()), 2)
+
+    def payload(self):
+        """
+        Returns the payload content after 6 header bits.
+        """
+        return self.bytes[6:]
 
     def length(self) -> int:
-        prefix_index = 6
-        while self.bytes[prefix_index] == '1':
-            prefix_index += 5
-        return prefix_index + 5
+        headers = 6
+        return headers + sum(1 + len(c) for c in self.groups())
+
+    def groups(self):
+        """
+        Each group is prefixed by a 1 bit except the last group,
+        which is prefixed by a 0 bit.
+        """
+        payload = self.payload()
+        for i in range(0, len(payload), 5):
+            prefix = payload[i]
+            group = payload[i + 1: i + 5]
+            yield group
+            if prefix == '0':
+                return
 
     def sub_packets(self) -> List['Packet']:
         return []
+
+    def __eq__(self, __o: object) -> bool:
+        return type(self) == type(__o) and self.calculate() == __o.calculate()
 
 
 class Sum(Operator):
@@ -162,7 +182,7 @@ class Equal(Operator):
 def read_puzzle_input(filename=INPUT_FILE) -> str:
     """
     The transmission was sent using the Buoyancy Interchange Transmission System (BITS),
-    a method of packing numeric expressions into a binary sequence. Your submarine's 
+    a method of packing numeric expressions into a binary sequence. Your submarine's
     computer has saved the transmission in hexadecimal (your puzzle input).
     """
     with open(filename) as file:
@@ -183,8 +203,11 @@ def sum_of_versions(packet: Packet) -> int:
 
 if __name__ == '__main__':
     bytes = hex2bin(read_puzzle_input())
-    version_sum = 0
 
+    # Part 1
+    version_sum = 0
     root = Packet.parse(bytes)
-    # print(sum_of_versions(root))
-    print(root.calculate())
+    print(f'Part 1: sum of version: {sum_of_versions(root)}')
+
+    # Part 2
+    print(f'Part 2: calculated value: {root.calculate()}')
