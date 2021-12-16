@@ -65,7 +65,7 @@ class Operator(Packet):
         return int(self.bytes[start: end], 2)
 
     def payload(self) -> str:
-        if self.length_type_id() == '0':
+        if self.length_type() == 'bits':
             """
             If the length type ID is 0, then the next 15 bits are a number that represents the total length
             in bits of the sub-packets contained by this packet.
@@ -93,7 +93,7 @@ class Operator(Packet):
         return self.bytes[6]
 
     def length_type(self) -> str:
-        return 'length' if self.bytes[6] == '1' else 'count'
+        return 'bits' if self.bytes[6] == '0' else 'packets'
 
 
 class Literal(Packet):
