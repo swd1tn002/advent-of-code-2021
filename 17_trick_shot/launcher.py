@@ -43,7 +43,8 @@ class Position:
 
 def read_puzzle_input(filename=INPUT_FILE) -> Area:
     """
-    target area: x=20..30, y=-10..-5
+    Converts text such as "target area: x=20..30, y=-10..-5" int a tuple of
+    Positions such as (Position(20, -10), Position(30, -5)).
     """
     num_pattern = r'(\-{0,1}\d+)'
     with open(filename) as file:
