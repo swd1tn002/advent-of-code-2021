@@ -53,6 +53,25 @@ def read_puzzle_input(filename=INPUT_FILE) -> Area:
         return (Position(x0, y0), Position(x1, y1))
 
 
+def trajectory_to_area(velocity: Velocity, area: Area) -> List[Position]:
+    """
+    Returns a path leading from (0, 0) to the given are with given initial
+    velocity, if on exists. If no path can be built, returns None.
+    """
+    position = Position(0, 0)
+    path: List[Position] = [position]
+
+    while is_moving_towards_target(position, velocity, area):
+        position = position.apply(velocity)
+        velocity = velocity.next()
+        path.append(position)
+
+        if position.in_area(area):
+            return path
+
+    return None
+
+
 def is_moving_towards_target(position: Position, velocity: Velocity, target_area: Area) -> bool:
     """
     Detects if a projectile is moving towards the given area.
@@ -81,21 +100,10 @@ if __name__ == '__main__':
         Velocity(x, y) for y in range(min_y, max_x) for x in range(1, max_x+1)
     ]
 
-    hit_paths: List[Velocity] = []
+    trajectories = list(filter(None, (trajectory_to_area(velocity, target_area)
+                                      for velocity in attempts)))
 
-    for velocity in attempts:
-        path: List[Position] = []
-        position = Position(0, 0)
+    max_y = max(pos.y for t in trajectories for pos in t)
 
-        while is_moving_towards_target(position, velocity, target_area):
-            position = position.apply(velocity)
-            velocity = velocity.next()
-            path.append(position)
-
-            if position.in_area(target_area):
-                hit_paths += [path]
-                break  # prevent duplicates
-
-    max_y = max(pos.y for path in hit_paths for pos in path)
     print(f'Part 1: maximum y value is {max_y}')
-    print(f'Part 2: total amount of projectiles is {len(hit_paths)}')
+    print(f'Part 2: total amount of projectiles is {len(trajectories)}')
