@@ -75,3 +75,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
     * Superclasses and subclasses
     * Overriding `__len__` and `__eq__`
     * Creating generator functions with `yield` keyword
+
+* Day 17
+
+    * Object oriented programming
