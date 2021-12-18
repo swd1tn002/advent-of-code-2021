@@ -1,5 +1,5 @@
 
-import re
+import json
 from collections import namedtuple
 from typing import List, Tuple
 import os
@@ -20,7 +20,7 @@ class Pair:
         return Pair(self.clone(), other.clone())._reduce()
 
     def clone(self) -> 'Pair':
-        return parse(repr(self))
+        return Pair(self.left.clone(), self.right.clone())
 
     def _reduce(self) -> bool:
         while self.explode(1)[0] or self.split():
@@ -59,9 +59,9 @@ class Pair:
         consist of two regular numbers. Then, the entire exploding pair is replaced with the
         regular number 0.
         """
-        if self.left.can_explode():
+        if type(self.left) == Pair:
             # the pair's right value is added to the first regular number to the right of the exploding pair(if any)
-            self.right.add_left(self.left.right.value)
+            self.right.increment_leftmost(self.left.right.value)
 
             overflow = self.left.left
             self.left = Value(0)
@@ -69,9 +69,9 @@ class Pair:
             # exploded with overflowing left value
             return True, Overflow(overflow, None)
 
-        elif self.right.can_explode():
+        elif type(self.right) == Pair:
             # the pair's left value is added to the first regular number to the left of the exploding pair
-            self.left.add_right(self.right.left.value)
+            self.left.increment_rightmost(self.right.left.value)
             overflow = self.right.right
             self.right = Value(0)
 
@@ -89,7 +89,7 @@ class Pair:
                 return True, overflow
 
             if overflow.right:
-                self.right.add_left(overflow.right.value)
+                self.right.increment_leftmost(overflow.right.value)
 
             # Explosion handled, no overflowing numbers left
             return True, Overflow(None, None)
@@ -104,36 +104,34 @@ class Pair:
                 return True, overflow
 
             if overflow.left:
-                self.left.add_right(overflow.left.value)
+                self.left.increment_rightmost(overflow.left.value)
 
             # Explosion handled, no overflowing numbers left
             return True, Overflow(None, None)
         else:
             return False, Overflow(None, None)
 
-    def can_explode(self) -> bool:
-        return True
-
-    def can_split(self) -> bool:
-        return self.left.can_split() or self.right.can_split()
+    def should_split(self) -> bool:
+        return self.left.should_split() or self.right.should_split()
 
     def split(self) -> 'Pair':
-        if self.left.can_split():
+        if self.left.should_split():
             self.left = self.left.split()
             return self
-        elif self.right.can_split():
+        elif self.right.should_split():
             self.right = self.right.split()
             return self
+        return None
 
-    def add_right(self, value):
-        self.right.add_right(value)
+    def increment_rightmost(self, value):
+        self.right.increment_rightmost(value)
 
-    def add_left(self, value):
-        self.left.add_left(value)
+    def increment_leftmost(self, value):
+        self.left.increment_leftmost(value)
 
     def magnitude(self) -> int:
         """
-        The magnitude of a pair is 3 times the magnitude of its left element 
+        The magnitude of a pair is 3 times the magnitude of its left element
         plus 2 times the magnitude of its right element.
         """
         return 3 * self.left.magnitude() + 2 * self.right.magnitude()
@@ -149,24 +147,24 @@ class Value(Pair):
     def __eq__(self, __o: object) -> bool:
         return type(self) == type(__o) and self.value == __o.value
 
+    def clone(self) -> 'Pair':
+        return Value(self.value)
+
     def explode(self, depth):
         return False, Overflow(None, None)
 
-    def can_explode(self) -> bool:
-        return False
-
-    def add_right(self, value):
+    def increment_rightmost(self, value):
         self.value += value
 
-    def add_left(self, value):
+    def increment_leftmost(self, value):
         self.value += value
 
-    def can_split(self) -> bool:
+    def should_split(self) -> bool:
         return self.value >= 10
 
     def split(self) -> Pair:
         """
-        To split a regular number, replace it with a pair; the left element of the pair 
+        To split a regular number, replace it with a pair; the left element of the pair
         should be the regular number divided by two and rounded down, while the right
         element of the pair should be the regular number divided by two and rounded up.
         """
@@ -182,7 +180,7 @@ class Value(Pair):
 def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
     """
     The homework assignment involves adding up a list of snailfish numbers (your puzzle input).
-    The snailfish numbers are each listed on a separate line. Add the first snailfish number 
+    The snailfish numbers are each listed on a separate line. Add the first snailfish number
     and the second, then add that result and the third, then add that result and the fourth,
     and so on until all numbers in the list have been used once.
     """
@@ -195,9 +193,14 @@ def parse(formula: str) -> Pair:
     [1,2] => Pair(Value(1), Value(2))
     [[3,4],5] => Pair(Pair(Value(3), Value(4)), Value(5))
     """
-    formula = re.sub(r'[^\d\[\],]', '', formula)  # Clean up anything extra
-    formula = re.sub(r'(\d)', r'Value(\1)', formula)
-    return eval(formula.replace('[', 'Pair(').replace(']', ')'))
+    def convert(elem):
+        if type(elem) == list:
+            return Pair(convert(elem[0]), convert(elem[1]))
+        else:
+            return Value(elem)
+
+    data = json.loads(formula)
+    return convert(data)
 
 
 if __name__ == '__main__':
