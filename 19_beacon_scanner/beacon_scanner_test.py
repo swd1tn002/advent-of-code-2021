@@ -56,3 +56,19 @@ def test_transform_scanner_and_beacons(scanners: List[Scanner]):
     set0 = set(map(str, s0.beacons))
     set1 = set(map(str, s1.beacons))
     assert len(set0 & set1) == 12
+
+
+def test_align_scanners(scanners: List[Scanner]):
+    s0, s1, s2, s3, s4 = align_scanners(scanners)
+
+    # ...scanner 1 must be at 68,-1246,-43 (relative to scanner 0).
+    assert s1.coordinates == [68, -1246, -43]
+
+    # ...scanner 2 must be at 1105,-1205,1229
+    assert s2.coordinates == [1105, -1205, 1229]
+
+    # ...scanner 3 must be at -92,-2380,-20
+    assert s3.coordinates == [-92, -2380, -20]
+
+    # ...scanner 4 is at -20,-1133,1061
+    assert s4.coordinates == [-20,-1133,1061]
