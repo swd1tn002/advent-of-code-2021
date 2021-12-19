@@ -2,6 +2,8 @@ import json
 from collections import namedtuple
 from typing import List, Tuple
 import os
+from functools import reduce
+
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
@@ -208,9 +210,7 @@ if __name__ == '__main__':
 
     # Part 1: Add up all of the snailfish numbers from the homework assignment
     # in the order they appear. What is the magnitude of the final sum?
-    snail = snail_numbers[0]
-    for next_num in snail_numbers[1:]:
-        snail = snail.plus(next_num)
+    snail = reduce(Pair.plus, snail_numbers)
 
     print(f'Part 1: magnitude is {snail.magnitude()}')
 
