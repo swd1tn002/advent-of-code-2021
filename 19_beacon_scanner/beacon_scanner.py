@@ -39,6 +39,8 @@ class Scanner:
         return [group_a, group_b]
 
     def transform(self, rotation, alignment):
+        self.coordinates = alignment
+
         self.beacons = [rotation(*b) for b in self.beacons]
         self.beacons = [add_coord(alignment, b) for b in self.beacons]
         self.distances = self._map_distances(self.beacons)
@@ -65,7 +67,7 @@ for i, chunk in enumerate(chunks):
 print(scanners)
 
 
-def rotators():
+def rotations():
     yield lambda x, y, z: [x, y, z]
     yield lambda x, y, z: [x, z, y]
     yield lambda x, y, z: [y, x, z]
@@ -73,26 +75,12 @@ def rotators():
     yield lambda x, y, z: [z, x, y]
     yield lambda x, y, z: [z, y, x]
 
-    yield lambda x, y, z: [-x, y, z]
-    yield lambda x, y, z: [-x, z, y]
-    yield lambda x, y, z: [y, -x, z]
-    yield lambda x, y, z: [y, -z, x]
-    yield lambda x, y, z: [z, -x, y]
-    yield lambda x, y, z: [z, y, -x]
-
-    yield lambda x, y, z: [x, -y, z]
-    yield lambda x, y, z: [x, z, -y]
-    yield lambda x, y, z: [-y, x, z]
-    yield lambda x, y, z: [-y, z, x]
-    yield lambda x, y, z: [z, x, -y]
-    yield lambda x, y, z: [z, -y, x]
-
-    yield lambda x, y, z: [x, y, -z]
-    yield lambda x, y, z: [x, -z, y]
-    yield lambda x, y, z: [y, x, -z]
-    yield lambda x, y, z: [y, -z, x]
-    yield lambda x, y, z: [-z, x, y]
-    yield lambda x, y, z: [-z, y, x]
+    yield lambda x, y, z: [-x, -y, -z]
+    yield lambda x, y, z: [-x, -z, -y]
+    yield lambda x, y, z: [-y, -x, -z]
+    yield lambda x, y, z: [-y, -z, -x]
+    yield lambda x, y, z: [-z, -x, -y]
+    yield lambda x, y, z: [-z, -y, -x]
 
     yield lambda x, y, z: [x, -y, -z]
     yield lambda x, y, z: [x, -z, -y]
@@ -115,12 +103,33 @@ def rotators():
     yield lambda x, y, z: [z, -x, -y]
     yield lambda x, y, z: [z, -y, -x]
 
+    yield lambda x, y, z: [-x, y, z]
+    yield lambda x, y, z: [-x, z, y]
+    yield lambda x, y, z: [y, -x, z]
+    yield lambda x, y, z: [y, -z, x]
+    yield lambda x, y, z: [z, -x, y]
+    yield lambda x, y, z: [z, y, -x]
+
+    yield lambda x, y, z: [x, -y, z]
+    yield lambda x, y, z: [x, z, -y]
+    yield lambda x, y, z: [-y, x, z]
+    yield lambda x, y, z: [-y, z, x]
+    yield lambda x, y, z: [z, x, -y]
+    yield lambda x, y, z: [z, -y, x]
+
+    yield lambda x, y, z: [x, y, -z]
+    yield lambda x, y, z: [x, -z, y]
+    yield lambda x, y, z: [y, x, -z]
+    yield lambda x, y, z: [y, -z, x]
+    yield lambda x, y, z: [-z, x, y]
+    yield lambda x, y, z: [-z, y, x]
+
 
 def find_transformation(mesh1, mesh2):
     """
     Returns a rotation function that converts mesh 2 into mesh 1.
     """
-    for rotation in rotators():
+    for rotation in rotations():
         rotated = [rotation(*beacon) for beacon in mesh2]
 
         # A set of vectors between the mesh 1 and mesh 2 points.
@@ -160,7 +169,7 @@ while unmapped:
                 rotation, alignment = find_transformation(a, b)
                 if rotation and alignment:
                     print(
-                        f'Detection cubes of {scanner_a} and {scanner_b} overlap!')
+                        f'Detection cubes {scanner_a} and {scanner_b} overlap!')
 
                     print(f'{scanner_b} is at {alignment}')
 
@@ -171,6 +180,7 @@ while unmapped:
                 else:
                     print(
                         f'Detection cubes of {scanner_a} and {scanner_b} could not be aligned!')
+                    print(f'{len(a)} {len(b)}')
 
 beacons = {str(beacon) for scanner in scanners for beacon in scanner.beacons}
 
@@ -185,3 +195,11 @@ print(len(beacons))
 
 for i, b in enumerate(beacons):
     print(i, b)
+
+
+def manhattan_distance(a: Scanner, b: Scanner) -> int:
+    return sum(abs(a.coordinates[i] - b.coordinates[i]) for i in range(3))
+
+
+print(max(manhattan_distance(a, b)
+      for a in scanners for b in scanners if a != b))
