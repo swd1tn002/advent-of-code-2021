@@ -18,7 +18,7 @@ class Scanner:
         self.distances = self._map_distances(beacons)
 
     def __repr__(self) -> str:
-        return f'{self.id} ({len(self.beacons)} beacons)'
+        return f'{self.id}'
 
     def _map_distances(self, beacons) -> Dict:
         return {
@@ -38,12 +38,18 @@ class Scanner:
                     group_b.append(json.loads(beacon1))
         return [group_a, group_b]
 
-    def rotate_all(self, rotation):
+    def transform(self, rotation, alignment):
         self.beacons = [rotation(*b) for b in self.beacons]
+        self.beacons = [add_coord(alignment, b) for b in self.beacons]
+        self.distances = self._map_distances(self.beacons)
 
-    def shift_position(self, vector):
-        self.beacons = [[b[0]-vector[0], b[1]-vector[1],
-                         b[2]-vector[2]] for b in self.beacons]
+
+def add_coord(c1, c2) -> List:
+    return [c1[i] + c2[i] for i in range(3)]
+
+
+def subtract_coord(c1, c2) -> List:
+    return [c1[i] - c2[i] for i in range(3)]
 
 
 chunks = txt.split('\n\n')
@@ -57,10 +63,6 @@ for i, chunk in enumerate(chunks):
     scanners.append(Scanner(i, beacons))
 
 print(scanners)
-
-
-def vector(c1, c2) -> List:
-    return [c1[i] - c2[i] for i in range(3)]
 
 
 def rotators():
@@ -114,7 +116,7 @@ def rotators():
     yield lambda x, y, z: [z, -y, -x]
 
 
-def find_rotation(mesh1, mesh2):
+def find_transformation(mesh1, mesh2):
     """
     Returns a rotation function that converts mesh 2 into mesh 1.
     """
@@ -123,12 +125,12 @@ def find_rotation(mesh1, mesh2):
 
         # A set of vectors between the mesh 1 and mesh 2 points.
         # If the meshes are in the same orientation, each vector is identical.
-        vectors = {str(vector(mesh1[i], rotated[i]))
+        vectors = {str(subtract_coord(mesh1[i], rotated[i]))
                    for i in range(len(rotated))}
 
         if len(vectors) == 1:
-            return rotation
-    raise Exception('No rotation found!')
+            return rotation, subtract_coord(mesh1[1], rotated[1])
+    return None, None
 
 
 # a, b = scanners[0].find_matching_beacons(scanners[1])
@@ -155,20 +157,22 @@ while unmapped:
 
             # Do they have overlapping detection cubes?
             if len(a) >= 12:
-                print(
-                    f'Detection cubes of {scanner_a} and {scanner_b} overlap!')
-                rotation = find_rotation(a, b)
-                scanner_b.rotate_all(rotation)
+                rotation, alignment = find_transformation(a, b)
+                if rotation and alignment:
+                    print(
+                        f'Detection cubes of {scanner_a} and {scanner_b} overlap!')
 
-                position_diff = vector(rotation(*b[0]), a[0])
+                    print(f'{scanner_b} is at {alignment}')
 
-                scanner_b.shift_position(position_diff)
+                    scanner_b.transform(rotation, alignment)
 
-                unmapped.remove(scanner_b)
-                mapped.append(scanner_b)
+                    unmapped.remove(scanner_b)
+                    mapped.append(scanner_b)
+                else:
+                    print(
+                        f'Detection cubes of {scanner_a} and {scanner_b} could not be aligned!')
 
-
-beacons = {str(b) for scanner in scanners for beacon in scanner.beacons}
+beacons = {str(beacon) for scanner in scanners for beacon in scanner.beacons}
 
 for scanner in mapped:
     print(scanner)
@@ -178,3 +182,6 @@ for scanner in mapped:
     print()
 
 print(len(beacons))
+
+for i, b in enumerate(beacons):
+    print(i, b)
