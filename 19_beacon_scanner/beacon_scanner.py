@@ -12,7 +12,7 @@ the same position for long periods of time. Each beacon has x, y and z coordinat
 Beacon = List[int]
 
 
-def read_puzzle_input(filename=INPUT_FILE) -> List[str]:
+def read_puzzle_input(filename=INPUT_FILE) -> List['Scanner']:
     """
     The submarine has automatically summarized the relative positions of beacons 
     detected by each scanner (your puzzle input).
