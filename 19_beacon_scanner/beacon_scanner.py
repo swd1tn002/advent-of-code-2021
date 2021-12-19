@@ -5,6 +5,10 @@ import os
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
+"""
+The beacons float motionless in the water; they're designed to maintain
+the same position for long periods of time. Each beacon has x, y and z coordinates.
+"""
 Beacon = List[int]
 
 
@@ -161,9 +165,14 @@ def manhattan_distance(a: Scanner, b: Scanner) -> int:
     return sum(abs(a.coordinates[i] - b.coordinates[i]) for i in range(3))
 
 
-if __name__ == '__main__':
-    scanners = read_puzzle_input()
+def align_scanners(scanners: List[Scanner]) -> List[Scanner]:
+    """
+    Aligns the given list of scanners by rotating and adjusting the coordinates
+    of given scanners and their beacons to match the orientation of the first
+    scanner on the list.
 
+    Returns the given list of scanners after being aligned.
+    """
     first, *unaligned = scanners
 
     aligned: List[Scanner] = [first]
@@ -182,6 +191,13 @@ if __name__ == '__main__':
 
                     unaligned.remove(other)
                     aligned.append(other)
+    return scanners
+
+
+if __name__ == '__main__':
+    scanners = read_puzzle_input()
+
+    scanners = align_scanners(scanners)
 
     # Part 1: Assemble the full map of beacons. How many beacons are there?
     all_beacons = {str(b) for scanner in scanners for b in scanner.beacons}

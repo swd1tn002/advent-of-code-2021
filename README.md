@@ -79,3 +79,13 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * Day 17
 
     * Object oriented programming
+
+* Day 18
+
+    * This was quite tricky
+    * Using reduce to add all snail numbers together
+
+* Day 19
+
+    * This was again very difficult to solve...
+    * Yielding lambdas
