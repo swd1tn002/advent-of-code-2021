@@ -71,10 +71,10 @@ def pixel_to_binary(image: Dict[Pixel, str], pixel: Pixel, infinity: str) -> str
     image enhancement algorithm string.
     """
     binary = ''
-    _x, _y = pixel
-    for y in (_y - 1, _y, _y + 1):
-        for x in (_x - 1, _x, _x + 1):
-            binary += image.get(Pixel(x, y), infinity)
+    x, y = pixel
+    for yd in (-1, 0, 1):
+        for xd in (-1, 0, 1):
+            binary += image.get(Pixel(x + xd, y + yd), infinity)
     return binary
 
 
