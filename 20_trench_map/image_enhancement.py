@@ -70,12 +70,10 @@ def pixel_to_binary(image: Dict[Pixel, str], pixel: Pixel, infinity: str) -> str
     These nine input pixels are combined into a single binary number that is used as an index in the
     image enhancement algorithm string.
     """
-    binary = ''
-    x, y = pixel
-    for yd in (-1, 0, 1):
-        for xd in (-1, 0, 1):
-            binary += image.get(Pixel(x + xd, y + yd), infinity)
-    return binary
+    return ''.join(
+        image.get(Pixel(pixel.x + xd, pixel.y + yd), infinity)
+        for yd in (-1, 0, 1) for xd in (-1, 0, 1)
+    )
 
 
 if __name__ == '__main__':
