@@ -10,7 +10,7 @@ Pixel = namedtuple('Pixel', 'x y')
 def read_algorithm_and_image(filename=INPUT_FILE) -> Tuple:
     """
     Reads the puzzle input, where the first section is the image enhancement algorithm.
-    The second section is the input image, a two-dimensional grid of light pixels(#) and dark pixels (.).
+    The second section is the input image, a two-dimensional grid of light pixels (#) and dark pixels (.).
 
     Returns the algorithm and a dictionary of pixels and their values converted to 1 and 0.
     """
