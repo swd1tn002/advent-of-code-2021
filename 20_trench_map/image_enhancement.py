@@ -10,9 +10,9 @@ Pixel = namedtuple('Pixel', 'x y')
 def read_algorithm_and_image(filename=INPUT_FILE) -> Tuple:
     """
     Reads the puzzle input, where the first section is the image enhancement algorithm.
-    The second section is the input image, a two-dimensional grid of light pixels(  # ) and dark pixels (.).
+    The second section is the input image, a two-dimensional grid of light pixels(#) and dark pixels (.).
 
-    Returns the algorithm and a dictionary of pixels and their values
+    Returns the algorithm and a dictionary of pixels and their values converted to 1 and 0.
     """
     with open(filename) as file:
         puzzle_input = file.read().replace('#', '1').replace('.', '0')
@@ -83,13 +83,9 @@ if __name__ == '__main__':
 
     print_image(pixels)
 
-    # Test
-    # print('34?', int(binary_pixel(pixels, Pixel(2, 2)), 2),
-    #      binary_pixel(pixels, Pixel(2, 2)))  # 34
-
     """
     The small input image you have is only a small region of the actual infinite input image;
-    the rest of the input image consists of dark pixels (.)
+    the rest of the infinite image consists of dark pixels (which may turn bright when image is enhanced!)
     """
     infinity = '0'
     enhanced = pixels
