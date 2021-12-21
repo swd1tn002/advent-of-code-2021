@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple
 from math import sqrt
-import json
+from collections import namedtuple
 import os
 
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -9,7 +9,7 @@ INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 The beacons float motionless in the water; they're designed to maintain
 the same position for long periods of time. Each beacon has x, y and z coordinates.
 """
-Beacon = List[int]
+Beacon = namedtuple('Beacon', 'x y z')
 
 
 def read_puzzle_input(filename=INPUT_FILE) -> List['Scanner']:
@@ -24,7 +24,8 @@ def read_puzzle_input(filename=INPUT_FILE) -> List['Scanner']:
         for i, chunk in enumerate(chunks):
             beacons = []
             for line in chunk.split('\n')[1:]:
-                beacons.append([int(i) for i in line.split(',')])
+                x, y, z = (int(i) for i in line.split(','))
+                beacons.append(Beacon(x, y, z))
 
             scanners.append(Scanner(i, beacons))
 
@@ -56,7 +57,7 @@ class Scanner:
     def __init__(self, id: int, beacons: List[Beacon]):
         self.id = id
         self.beacons = beacons
-        self.coordinates = [0, 0, 0]
+        self.coordinates = Beacon(0, 0, 0)
         self.distances = self._map_distances(beacons)
 
     def __repr__(self) -> str:
@@ -64,8 +65,8 @@ class Scanner:
 
     def _map_distances(self, beacons) -> Dict:
         return {
-            str(beacon): {distance(beacon, other)
-                          for other in beacons}
+            beacon: {distance(beacon, other)
+                     for other in beacons}
             for beacon in beacons
         }
 
@@ -89,8 +90,8 @@ class Scanner:
                 # If two beacons detected by two scanners have equal distances to 11
                 # other beacons, they are determined to actually be the same beacon.
                 if len(distance_set0 & distance_set1) >= 12:
-                    group_a.append(json.loads(beacon0))
-                    group_b.append(json.loads(beacon1))
+                    group_a.append(beacon0)
+                    group_b.append(beacon1)
 
         return [group_a, group_b]
 
@@ -102,17 +103,17 @@ class Scanner:
         """
         self.coordinates = alignment
 
-        self.beacons = [rotation(*b) for b in self.beacons]
+        self.beacons = [rotation(b) for b in self.beacons]
         self.beacons = [add_coord(alignment, b) for b in self.beacons]
         self.distances = self._map_distances(self.beacons)
 
 
-def add_coord(c1: Beacon, c2: Beacon) -> Beacon:
-    return [c1[i] + c2[i] for i in range(3)]
+def add_coord(b1: Beacon, b2: Beacon) -> Beacon:
+    return Beacon(b1.x + b2.x, b1.y + b2.y, b1.z + b2.z)
 
 
-def subtract_coord(c1: Beacon, c2: Beacon) -> Beacon:
-    return [c1[i] - c2[i] for i in range(3)]
+def subtract_coord(b1: Beacon, b2: Beacon) -> Beacon:
+    return Beacon(b1.x - b2.x, b1.y - b2.y, b1.z - b2.z)
 
 
 def rotations():
@@ -123,17 +124,17 @@ def rotations():
     This function generates functions for transforming a coordinate to all possible
     rotations and facing directions.
     """
-    directions = [
+    facing_directions = [
         [1, 1, 1], [-1, -1, -1], [-1, 1, 1], [1, -1, 1],
         [1, 1, -1], [-1, -1, 1], [1, -1, -1], [-1, 1, -1]
     ]
-    for a, b, c in directions:
-        yield lambda x, y, z: [a * x, b * y, c * z]
-        yield lambda x, y, z: [a * x, b * z, c * y]
-        yield lambda x, y, z: [a * y, b * x, c * z]
-        yield lambda x, y, z: [a * y, b * z, c * x]
-        yield lambda x, y, z: [a * z, b * x, c * y]
-        yield lambda x, y, z: [a * z, b * y, c * x]
+    for r1, r2, r3 in facing_directions:
+        yield lambda b: Beacon(r1 * b.x, r2 * b.y, r3 * b.z)
+        yield lambda b: Beacon(r1 * b.x, r2 * b.z, r3 * b.y)
+        yield lambda b: Beacon(r1 * b.y, r2 * b.x, r3 * b.z)
+        yield lambda b: Beacon(r1 * b.y, r2 * b.z, r3 * b.x)
+        yield lambda b: Beacon(r1 * b.z, r2 * b.x, r3 * b.y)
+        yield lambda b: Beacon(r1 * b.z, r2 * b.y, r3 * b.x)
 
 
 def find_transformation(mesh1: List[Beacon], mesh2: List[Beacon]) -> Tuple:
@@ -145,7 +146,7 @@ def find_transformation(mesh1: List[Beacon], mesh2: List[Beacon]) -> Tuple:
     Returns a function for rotating and a Beacon vector for aligning the second mesh.
     """
     for rotation in rotations():
-        rotated = [rotation(*beacon) for beacon in mesh2]
+        rotated = [rotation(beacon) for beacon in mesh2]
 
         # A set of vectors between the mesh 1 and mesh 2 points.
         # If the meshes are in the same orientation, each vector is identical.

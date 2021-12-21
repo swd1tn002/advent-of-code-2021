@@ -14,7 +14,7 @@ def test_reading_input():
     scanners = read_puzzle_input(TEST_INPUT_FILE)
 
     assert len(scanners) == 5
-    assert scanners[0].coordinates == [0, 0, 0]
+    assert scanners[0].coordinates == (0, 0, 0)
 
 
 def test_overlapping_scanners(scanners: List[Scanner]):
@@ -32,11 +32,11 @@ def test_overlapping_scanners(scanners: List[Scanner]):
     686, 422, 578  ...  553, 889, -390
     """
 
-    assert [-618, -824, -621] in beacons0
-    assert [686, 422, 578] in beacons1
+    assert (-618, -824, -621) in beacons0
+    assert (686, 422, 578) in beacons1
 
-    assert [-485, -357, 347] in beacons0
-    assert [553, 889, -390] in beacons1
+    assert (-485, -357, 347) in beacons0
+    assert (553, 889, -390) in beacons1
 
 
 def test_transform_scanner_and_beacons(scanners: List[Scanner]):
@@ -47,7 +47,7 @@ def test_transform_scanner_and_beacons(scanners: List[Scanner]):
     beacons0, beacons1 = s0.find_matching_beacons(s1)
 
     rotation, alignment = find_transformation(beacons0, beacons1)
-    assert alignment == [68, -1246, -43]
+    assert alignment == (68, -1246, -43)
 
     # Change the orientation and alignment of scanner 1 to match scanner 0:
     s1.transform(rotation, alignment)
@@ -62,13 +62,13 @@ def test_align_scanners(scanners: List[Scanner]):
     s0, s1, s2, s3, s4 = align_scanners(scanners)
 
     # ...scanner 1 must be at 68,-1246,-43 (relative to scanner 0).
-    assert s1.coordinates == [68, -1246, -43]
+    assert s1.coordinates == (68, -1246, -43)
 
     # ...scanner 2 must be at 1105,-1205,1229
-    assert s2.coordinates == [1105, -1205, 1229]
+    assert s2.coordinates == (1105, -1205, 1229)
 
     # ...scanner 3 must be at -92,-2380,-20
-    assert s3.coordinates == [-92, -2380, -20]
+    assert s3.coordinates == (-92, -2380, -20)
 
     # ...scanner 4 is at -20,-1133,1061
-    assert s4.coordinates == [-20,-1133,1061]
+    assert s4.coordinates == (-20, -1133, 1061)
