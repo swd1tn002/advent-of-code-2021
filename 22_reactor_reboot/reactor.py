@@ -1,4 +1,6 @@
 import re
+from collections import namedtuple
+from typing import List
 
 steps = """on x=-1..48,y=-16..38,z=-20..25
 on x=-18..29,y=-44..3,z=-10..43
@@ -421,31 +423,150 @@ off x=20573..26063,y=-30310..-12158,z=-89541..-58150
 off x=64081..88596,y=-25922..-5947,z=16732..46694
 off x=79458..91210,y=-6760..4282,z=1518..13350""".split('\n')
 
-reactor = {
 
-}
-
-for step in steps:
-    print(step)
-    num_pattern = r'(\-{0,1}\d+)'
-    x0, x1, y0, y1, z0, z1 = [int(n) for n in re.findall(num_pattern, step)]
-    # For part 1:
-    x0, x1 = max(-50, x0), min(50, x1)
-    y0, y1 = max(-50, y0), min(50, y1)
-    z0, z1 = max(-50, z0), min(50, z1)
-    value = ('on' == step[:2])
-    for x in range(x0, x1+1):
-        for y in range(y0, y1+1):
-            for z in range(z0, z1+1):
-                reactor[(x, y, z)] = value
-
-# Part 1
-# Execute the reboot steps. Afterward, considering only cubes in the region
-# x = -50..50, y = -50..50, z = -50..50, how many cubes are on?
+Coord = namedtuple('Coord', 'x y z')
 
 
-def in_region(coord): return min(coord) >= -50 and max(coord) <= 50
+class Cuboid:
+    def __init__(self, c0: Coord, c1: Coord, value: bool):
+        self.c0 = c0
+        self.c1 = c1
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f'Cuboid {self.c0} -> {self.c1} is {self.value}'
+
+    def size(self) -> int:
+        """
+        Calculates the size of this Cuboid.
+        """
+        x0, y0, z0 = self.c0
+        x1, y1, z1 = self.c1
+        return (x1-x0) * (y1-y0) * (z1-z0)
+
+    def is_inside(self, other: 'Cuboid') -> bool:
+        """
+        Returns True if this Cuboid is fully inside the given one.
+        """
+        return self.c0.x >= other.c0.x and self.c1.x <= other.c1.x and \
+            self.c0.y >= other.c0.y and self.c1.y <= other.c1.y and \
+            self.c0.z >= other.c0.z and self.c1.z <= other.c1.z
+
+    def overlaps(self, other: 'Cuboid') -> bool:
+        """
+        Returns True if the given Cuboid has any overlapping lights with this one.
+        """
+        min_x1, max_x1 = self.c0.x, self.c1.x
+        min_x2, max_x2 = other.c0.x, other.c1.x
+        min_y1, max_y1 = self.c0.y, self.c1.y
+        min_y2, max_y2 = other.c0.y, other.c1.y
+        min_z1, max_z1 = self.c0.z, self.c1.z
+        min_z2, max_z2 = other.c0.z, other.c1.z
+
+        if min_x1 >= max_x2:
+            return False
+        if max_x1 <= min_x2:
+            return False
+        if min_y1 >= max_y2:
+            return False
+        if max_y1 <= min_y2:
+            return False
+        if min_z1 >= max_z2:
+            return False
+        if max_z1 <= min_z2:
+            return False
+        return True
+
+    def explode_with(self, other: 'Cuboid') -> List['Cuboid']:
+        """
+        Splits the two Cuboids into max 27 new ones. The given Cuboids value 
+        takes higher priority when determining the value for the new Cuboid.
+
+        Returns two lists: first with new Cuboids from this one and the 
+        second with new Cuboids from the other.
+        """
+        corners = (self.c0, self.c1, other.c0, other.c1)
+        x_values = sorted([c.x for c in corners])
+        y_values = sorted([c.y for c in corners])
+        z_values = sorted([c.z for c in corners])
+
+        split0: List['Cuboid'] = []
+        split1: List['Cuboid'] = []
+
+        if self.is_inside(other):
+            # Just forget about this and use the other Cuboid if this is inside the other
+            return [], [other]
+
+        for i in range(3):
+            for j in range(3):
+                for k in range(3):
+                    c0 = Coord(x_values[i], y_values[j], z_values[k])
+                    c1 = Coord(x_values[i+1], y_values[j+1], z_values[k+1])
+                    r = Cuboid(c0, c1, None)
+                    if r.size() == 0:
+                        # Ignore cuboids with size 0
+                        pass
+                    elif r.overlaps(other):
+                        r.value = other.value
+                        split1.append(r)
+                    elif r.overlaps(self):
+                        r.value = self.value
+                        split0.append(r)
+                    else:
+                        # The new Cuboid is outside the boundaries of both original Cuboids
+                        pass
+
+        return split0, split1
 
 
-on_within_region = [c for c, v in reactor.items() if v and in_region(c)]
-print(len(on_within_region))
+if __name__ == '__main__':
+    cuboids: List[Cuboid] = []
+
+    # Read steps from puzzle input
+    for line in steps:
+        number = r'(\-{0,1}\d+)'
+        x0, x1, y0, y1, z0, z1 = [int(n) for n in re.findall(number, line)]
+
+        value = ('on' == line[:2])
+
+        # As the end coordinates in the puzzle input are inclusive, we add
+        # +1 to each dimension so we can use exclusive upper limits from now on.
+        cube = Cuboid(Coord(x0, y0, z0), Coord(x1+1, y1+1, z1+1), value)
+        cuboids.append(cube)
+
+    # Apply all cuboids in the steps. In case of overlapping cuboids, split them into non-overlapping
+    # parts until no overlapping Cuboids exist.
+    i = 0
+    while i < len(cuboids):
+        j = i + 1
+
+        while j < len(cuboids):
+            cube_i = cuboids[i]
+            cube_j = cuboids[j]
+
+            if cube_i.overlaps(cube_j):
+                # Replace both cuboids with equal but not overlapping smaller cuboids.
+                # Overlapping areas from the cube_i are cut out, as j formed after a later step:
+                cuboids_i, cuboids_j = cube_i.explode_with(cube_j)
+
+                # As j > i, always replace the latter ones first to avoid shifting their indices
+                cuboids[j:j+1] = cuboids_j
+                cuboids[i:i+1] = cuboids_i
+
+                if len(cuboids_i) == 0:
+                    # cube_i was completely removed. Start comparing to the new cube_i value
+                    # from the cuboid right after it:
+                    j = i + 1
+            j += 1
+        i += 1
+
+        if i % 100 == 0:
+            print(f'i: {i}, cuboids: {len(cuboids)}')
+
+    total = 0
+    for cube in cuboids:
+        if cube.value:
+            total += cube.size()
+
+    # Correct answer: 1134088247046731
+    print(f'Part 2: In total {total} lights are on')
