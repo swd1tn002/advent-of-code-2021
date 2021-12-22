@@ -96,4 +96,9 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
 * [Day 21](21_dirac_dice/)
 
-    * Second puzzle that I could not solve alone. Found a hint for part 2 from Koodiklinikka.
+    * Second puzzle where I could not solve part 2 alone. Found a hint 2 from Koodiklinikka.
+
+* [Day 22](22_reactor_reboot/)
+
+    * Got a slow but working solution together after all.
+    * Splitting a collection overlapping 3D cubes into non-overlapping ones until no cubes overlap.

@@ -8,6 +8,9 @@ def test_overlapping_one_inside_other():
     assert r0.overlaps(r1)
     assert r1.overlaps(r0)
 
+    assert r1.is_inside(r0)
+    assert not r0.is_inside(r1)
+
 
 def test_overlapping_one_next_to_other():
     c0 = Cuboid(Coord(0, 0, 0), Coord(10, 10, 10), False)
