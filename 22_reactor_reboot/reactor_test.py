@@ -1,4 +1,4 @@
-from reactor import Cuboid, Coord
+from reactor import Cuboid, Coord, parse_cuboid
 
 
 def test_overlapping_one_inside_other():
@@ -15,6 +15,11 @@ def test_overlapping_one_next_to_other():
 
     assert not c0.overlaps(c1)
     assert not c1.overlaps(c0)
+
+
+def test_parse_cuboid():
+    cuboid = parse_cuboid("on x=10..12,y=10..12,z=10..12")
+    assert cuboid == Cuboid(Coord(10, 10, 10), Coord(13, 13, 13), True)
 
 
 def test_size():
