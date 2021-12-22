@@ -164,7 +164,10 @@ if __name__ == '__main__':
                     # cube_i was completely removed. Start comparing to the new cube_i value
                     # from the cuboid right after it:
                     j = i + 1
-            j += 1
+                else:
+                    j += 1
+            else:
+                j += 1
         i += 1
 
     total = sum((cube.size() for cube in cuboids if cube.value))
