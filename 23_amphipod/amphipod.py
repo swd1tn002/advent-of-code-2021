@@ -8,6 +8,8 @@ puzzle = """
 #############
 #...........#
 ###C#B#A#D###
+  #D#C#B#A#
+  #D#B#A#C#
   #C#D#A#B#
   #########
 """
@@ -29,34 +31,29 @@ move_costs = {
 
 
 def is_completed(puzzle) -> bool:
-    return puzzle[2][3:10] == puzzle[3][3:10] == ['A', '#', 'B', '#', 'C', '#', 'D']
+    home_rows = puzzle[2:-1]
+    return all(row[3:10] == ['A', '#', 'B', '#', 'C', '#', 'D'] for row in home_rows)
 
 
 def can_move_in(puzzle, start: Square, end: Square):
-    # Can only move to own end columns
-    char = puzzle[start[0]][start[1]]
-    if end[1] != home_columns[char]:
+    # Can only move to own end columns or "rooms"
+    char = puzzle[start.row][start.col]
+
+    if end.col != home_columns[char]:
         return False
 
-    # If moving to upper home square, lower must already have the equal character
-    if end[0] == 2 and puzzle[3][end[1]] != char:
+    # If moving to a square inside "home room", all previous squares must
+    # already have the equal character
+    if any(puzzle[r][end.col] != char for r in range(end.row+1, len(puzzle)-1)):
         return False
 
-    r0, c0 = start
-    r1, c1 = end
-    if c0 < c1:
-        if any(x != '.' for x in puzzle[r0][c0+1:c1]):
-            return False
-    else:
-        if any(x != '.' for x in puzzle[r0][c1:c0]):
-            return False
+    # Moving to the right or to the left:
+    if any(x != '.' for x in puzzle[start.row][start.col+1:end.col+1] + puzzle[start.row][end.col:start.col]):
+        return False
 
-    if r0 < r1:
-        if any(row[c1] != '.' for row in puzzle[r0+1: r1+1]):
-            return False
-    else:
-        if any(row[c1] != '.' for row in puzzle[r0+1: r1+1]):
-            return False
+    # Moving in the home cells (row increases)
+    if any(row[end.col] != '.' for row in puzzle[start.row+1: end.row+1]):
+        return False
 
     return True
 
@@ -64,13 +61,8 @@ def can_move_in(puzzle, start: Square, end: Square):
 def can_move_out(puzzle, start: Square, end: Square):
     char = puzzle[start.row][start.col]
 
-    # TODO: move to separate function
-    # Can't move out when in lower square at home base
-    if start.row == 3 and home_columns[char] == start.col:
-        return False
-
-    # Can't move out when in upper square at home base and the lower is also in place
-    if start.row == 2 and home_columns[char] == start.col and puzzle[start.row+1][start.col] == char:
+    # Moving out of the home room is not allowed if all previous chars are in correct places
+    if home_columns[char] == start.col and all(puzzle[r][start.col] == char for r in range(start.row, len(puzzle) - 1)):
         return False
 
     if any(row[start.col] != '.' for row in puzzle[end.row: start.row]):
@@ -99,37 +91,32 @@ def print_puzzle(puzzle: List[List[str]]):
 
 
 def move_amphipods_home(puzzle, cost):
+    """
+    Moving amphipods to home can open up the way to previously 
+    blocked ones, so this needs to be repeated with recursion.
+    """
     row = 1
-    moved = True
-    while moved:
-        moved = False
-        for i, char in enumerate(puzzle[1]):
-            if char not in 'ABCD':
-                continue
 
-            current = Square(row, i)
-            upper_home = Square(2, home_columns[char])
-            lower_home = Square(3, home_columns[char])
+    for i, char in enumerate(puzzle[1]):
+        if char not in 'ABCD':
+            continue
 
-            if can_move_in(puzzle, current, upper_home):
-                new_puzzle, new_cost = move(puzzle, current, upper_home)
-                puzzle = new_puzzle
-                cost += new_cost
-                moved = True
+        current = Square(row, i)
+        home_squares = [Square(r, home_columns[char])
+                        for r in range(2, len(puzzle)-1)]
 
-            elif can_move_in(puzzle, current, lower_home):
-                new_puzzle, new_cost = move(puzzle, current, lower_home)
-                puzzle = new_puzzle
-                cost += new_cost
-                moved = True
+        for home in home_squares:
+            if can_move_in(puzzle, current, home):
+                new_puzzle, new_cost = move(puzzle, current, home)
+                return move_amphipods_home(new_puzzle, cost + new_cost)
+
     return puzzle, cost
 
 
 def move_amphipods_out(puzzle, cost, queue: PriorityQueue, visited: set):
-    home_rows = (2, 3)
     # Squares directly above the "homes" are not allowed
     allowed_squares = set(range(1, 12)) - set(home_columns.values())
-    for row in home_rows:
+    for row in range(2, len(puzzle) - 1):
         for col in home_columns.values():
             current = Square(row, col)
             if puzzle[row][col] in 'ABCD':
