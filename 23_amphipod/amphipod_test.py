@@ -3,7 +3,7 @@ from pytest import fixture
 
 test_input = """
 #############
-#.A.B.D.C...#
+#DA.B...C...#
 ###.#.#.#.###
   #A#B#C#D#
   #########
@@ -19,4 +19,4 @@ def test_moving_home_with_costs(test_puzzle):
     solution, cost = move_amphipods_home(test_puzzle, 0)
 
     assert is_completed(solution)
-    assert cost == 4_222  # 3*1 + 2*10 + 2*100 + 4*1000
+    assert cost == 9_222  # 2*1 + 2*10 + 2*100 + 9*1000
