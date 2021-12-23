@@ -4,23 +4,14 @@ from queue import PriorityQueue
 
 Square = namedtuple('Square', 'row col')
 
-puzzle = """
-#############
-#...........#
-###C#B#A#D###
-  #C#D#A#B#
-  #########
-"""
-puzzle = [list(row) for row in puzzle.strip().split('\n')]
-
-home_columns = {
+HOME_COLUMNS = {
     'A': 3,
     'B': 5,
     'C': 7,
     'D': 9
 }
 
-move_costs = {
+MOVE_COSTS = {
     'A': 1,
     'B': 10,
     'C': 100,
@@ -37,7 +28,7 @@ def can_move_in(puzzle, start: Square, end: Square):
     # Can only move to own end columns or "rooms"
     char = puzzle[start.row][start.col]
 
-    if end.col != home_columns[char]:
+    if end.col != HOME_COLUMNS[char]:
         return False
 
     # If moving to a square inside "home room", all previous squares must
@@ -60,7 +51,7 @@ def can_move_out(puzzle, start: Square, end: Square):
     char = puzzle[start.row][start.col]
 
     # Moving out of the home room is not allowed if all previous chars are in correct places
-    if home_columns[char] == start.col and all(puzzle[r][start.col] == char for r in range(start.row, len(puzzle) - 1)):
+    if HOME_COLUMNS[char] == start.col and all(puzzle[r][start.col] == char for r in range(start.row, len(puzzle) - 1)):
         return False
 
     if any(row[start.col] != '.' for row in puzzle[end.row: start.row]):
@@ -80,7 +71,7 @@ def move(puzzle, start: Square, end: Square):
     copy[start.row][start.col] = '.'
 
     manhattan_distance = abs(start.row - end.row) + abs(start.col - end.col)
-    return copy, manhattan_distance * move_costs[char]
+    return copy, manhattan_distance * MOVE_COSTS[char]
 
 
 def print_puzzle(puzzle: List[List[str]]):
@@ -100,7 +91,7 @@ def move_amphipods_home(puzzle, cost):
             continue
 
         current = Square(row, i)
-        home_squares = [Square(r, home_columns[char])
+        home_squares = [Square(r, HOME_COLUMNS[char])
                         for r in range(2, len(puzzle)-1)]
 
         for home in home_squares:
@@ -113,9 +104,9 @@ def move_amphipods_home(puzzle, cost):
 
 def move_amphipods_out(puzzle, cost, queue: PriorityQueue, visited: set):
     # Squares directly above the "homes" are not allowed
-    allowed_squares = set(range(1, 12)) - set(home_columns.values())
+    allowed_squares = set(range(1, 12)) - set(HOME_COLUMNS.values())
     for row in range(2, len(puzzle) - 1):
-        for col in home_columns.values():
+        for col in HOME_COLUMNS.values():
             current = Square(row, col)
             if puzzle[row][col] in 'ABCD':
                 for x in allowed_squares:
@@ -132,19 +123,33 @@ def move_amphipods_out(puzzle, cost, queue: PriorityQueue, visited: set):
 
 def solve_puzzle(puzzle, cost, queue, visited):
     if is_completed(puzzle):
-        print(f'Solved with cost {cost}')
-        exit()
+        return puzzle, cost
 
     if str(puzzle) not in visited:
         move_amphipods_out(puzzle, cost, queue, visited)
         visited.add(str(puzzle))
+    return None, None
 
 
-visited = set()
-queue = PriorityQueue()
-queue.put((0, puzzle))
+if __name__ == '__main__':
+    puzzle = """
+#############
+#...........#
+###C#B#A#D###
+  #C#D#A#B#
+  #########
+"""
+    puzzle = [list(row) for row in puzzle.strip().split('\n')]
 
-while not queue.empty():
-    cost, puzzle = queue.get()
-    if str(puzzle) not in visited:
-        solve_puzzle(puzzle, cost, queue, visited)
+    visited = set()
+    queue = PriorityQueue()
+    queue.put((0, puzzle))
+    solution = None
+
+    while not solution and not queue.empty():
+        cost, puzzle = queue.get()
+        if str(puzzle) not in visited:
+            solution, cost = solve_puzzle(puzzle, cost, queue, visited)
+            if solution:
+                print(f'Solved with cost {cost}!')
+                print_puzzle(puzzle)
