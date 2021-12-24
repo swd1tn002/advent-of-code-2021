@@ -106,3 +106,8 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 * [Day 23](23_amphipod/)
 
     * Applying the shortest path logic to find the most efficient moves to solve a puzzle.
+
+* [Day 24](24_arithmetic_logic_unit/)
+
+    * Iterative and recursive calls to a list of functions to keep and cache intermediate results.
+    * Interpreting another languate into Python.
