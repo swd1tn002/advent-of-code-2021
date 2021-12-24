@@ -3,6 +3,9 @@ from collections.abc import Callable
 from functools import lru_cache
 from monad import *
 
+# The puzzle input is split into 14 different steps, each of which consumes
+# a single digit from the 14 digit serial numbers. The steps reduce the overlapping
+# calculations when validating consecutive serial numbers.
 solvers = (solver0, solver1, solver2, solver3, solver4, solver5, solver6,
            solver7, solver8, solver9, solver10, solver11, solver12, solver13)
 
