@@ -1,20 +1,14 @@
-from alu import ALU
+from alu_interpreter import alu_function
 
 
-def test_negate():
-    program = ['inp x', 'mul x -1']
-    inp = [3]
+def test_converting_alu_to_python():
+    lines = ['add z w',
+             'mod z 2',
+             'div w 2']
 
-    alu = ALU(program)
-    result = alu.process({'w': 0, 'x': 0, 'y': 0, 'z': 0}, inp)
-    assert result['x'] == -3
+    converted = [line for line in alu_function(0, lines)]
 
-
-def test_three_times_larger():
-    alu = ALU(['inp z', 'inp x', 'mul z 3', 'eql z x'])
-
-    result_true = alu.process({'w': 0, 'x': 0, 'y': 0, 'z': 0}, [2, 6])
-    assert result_true['z'] == 1
-
-    result_false = alu.process({'w': 0, 'x': 0, 'y': 0, 'z': 0}, [2, 7])
-    assert result_false['z'] == 0
+    assert 'z += w' in converted[1]
+    assert 'z %= 2' in converted[2]
+    assert 'w //= 2' in converted[3]
+    assert 'return w, x, y, z' in converted[4]
