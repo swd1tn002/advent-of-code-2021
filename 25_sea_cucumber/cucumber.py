@@ -15,17 +15,6 @@ def read_input_file(file=INPUT_FILE) -> str:
         return f.read()
 
 
-def transpose(floor: str) -> str:
-    original = floor.split('\n')
-    result = [['.'] * len(original) for i in range(len(original[0]))]
-
-    for y in range(len(original)):
-        for x in range(len(original[0])):
-            result[x][y] = original[y][x]
-
-    return '\n'.join(''.join(chars) for chars in result)
-
-
 def move_sea_cucumbers(floor: str) -> str:
     """
     There are two herds of sea cucumbers sharing the same region; one always moves east (>), 
@@ -52,13 +41,17 @@ def _move_east(floor: str) -> str:
 
 
 def _move_south(floor: str) -> str:
-    floor = transpose(floor)
+    """
+    "Horizontal lines" are easier to manipulate than vertical, so the ocean floor is
+    transposed before and after the needed operations.
+    """
+    floor = _transpose_floor(floor)
     lines = [
         # sea cucumbers that move off the bottom edge of the map appear on the top edge
         (line[-1] + line + line[0]).replace('v.', '.v')[1:-1]
         for line in floor.split('\n')
     ]
-    return transpose('\n'.join(lines))
+    return _transpose_floor('\n'.join(lines))
 
 
 def count_steps_until_stable(floor: str, max=1_000) -> int:
@@ -74,6 +67,26 @@ def count_steps_until_stable(floor: str, max=1_000) -> int:
             previous = floor
 
     return -1
+
+
+def _transpose_floor(floor: str) -> str:
+    """
+    Returns a copy of the given ocean floor where the x and y axes have been swapped.
+
+    ab      ac
+    cd  =>  bd
+    """
+    lines = floor.split('\n')
+    height = len(lines)
+    width = len(lines[0])
+
+    rotated = [[' '] * height for _ in range(width)]
+
+    for y in range(height):
+        for x in range(width):
+            rotated[x][y] = lines[y][x]
+
+    return '\n'.join(''.join(chars) for chars in rotated)
 
 
 if __name__ == '__main__':

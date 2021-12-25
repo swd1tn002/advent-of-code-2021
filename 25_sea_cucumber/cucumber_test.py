@@ -1,9 +1,9 @@
-from cucumber import _move_east, _move_south, transpose, count_steps_until_stable
+from cucumber import _move_east, _move_south, _transpose_floor, count_steps_until_stable
 
 
 def test_transpose():
     floor = 'abc\ndef'
-    assert transpose(floor) == 'ad\nbe\ncf'
+    assert _transpose_floor(floor) == 'ad\nbe\ncf'
 
 
 def test_move_east_wraps_over():
@@ -12,8 +12,8 @@ def test_move_east_wraps_over():
 
 
 def test_move_south_wraps_over():
-    floor = transpose('..v>..v..v')
-    assert _move_south(floor) == transpose('v.v>...v..')
+    floor = _transpose_floor('..v>..v..v')
+    assert _move_south(floor) == _transpose_floor('v.v>...v..')
 
 
 def test_steps_to_freeze_example_data():
