@@ -1,6 +1,8 @@
 # Advent of code 2021 [![Python package](https://github.com/swd1tn002/advent-of-code-2021/actions/workflows/python-package.yml/badge.svg)](https://github.com/swd1tn002/advent-of-code-2021/actions/workflows/python-package.yml)
 
-Personal attempts at solving https://adventofcode.com/ with Python and learning Python development.
+This repository contains my personal solutions to [Advent of code 2021](https://adventofcode.com/2021).
+
+All solutions are written in Python.
 
 ## Things exercised during the days
 
@@ -111,3 +113,7 @@ Personal attempts at solving https://adventofcode.com/ with Python and learning 
 
     * Iterative and recursive calls to a list of functions to keep and cache intermediate results.
     * Interpreting another languate into Python.
+
+* [Day 25](25_sea_cucumber/)
+
+    * Wrapping a 2D plane over the horizontal and vertical axes.
