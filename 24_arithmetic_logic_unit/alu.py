@@ -3,9 +3,8 @@ from collections.abc import Callable
 from functools import lru_cache
 from monad import *
 
-# The puzzle input is split into 14 different steps, each of which consumes
-# a single digit from the 14 digit serial numbers. The steps reduce the overlapping
-# calculations when validating consecutive serial numbers.
+# The MONAD program is split into 14 different steps, each of which consumes
+# a single digit from the 14 digit serial numbers.
 solvers = (solver0, solver1, solver2, solver3, solver4, solver5, solver6,
            solver7, solver8, solver9, solver10, solver11, solver12, solver13)
 
@@ -13,16 +12,15 @@ solvers = (solver0, solver1, solver2, solver3, solver4, solver5, solver6,
 @lru_cache(maxsize=100_000)
 def solve(x, y, z, funcs: Tuple[Callable], order: Tuple[int]) -> Tuple:
     """
-    This function is executed recursively 14 times. Each time corresponds to a single
-    digit in a 14 digit serial number being validated. For each digit the function sets
-    all accepted values in the given `order`, calls the sub function that processes that
-    input value and passes the results along recursively to try all next combinations.
+    Applies depth-first-search to find the first sequence of numbers that, when given
+    to the MONAD program, produce the z value of 0.
 
-    If all the functions are consumed, there is no more digits to try, and this function 
-    determines if the end value for `z` is 0 (a valid serial number). If so, `True` and
-    the digits leading to the outcome are catenated and returned.
+    The MONAD program is split into 14 steps, which each read one input parameter (w)
+    and use three parameters from previous results (x, y and z).
 
-    If no recursive calls are successful, this function returns (False, None).
+    When all the parts of the MONAD (funcs) are consumed, this function determines if 
+    the end value for `z` is 0 (a valid serial number). If so, `True` and the digits
+    leading to the outcome are catenated and returned.
     """
 
     if not funcs:
