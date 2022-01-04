@@ -37,7 +37,7 @@ def parse_insertion_rule(line: str) -> Tuple[str, str]:
     return pair, insertion
 
 
-def count_next_step(pairs_and_counts: Counter, insertion_rules: Dict[str, str]) -> Counter[str, int]:
+def count_next_step(pairs_and_counts: Counter, insertion_rules: Dict[str, str]) -> Counter:
     """
     Note that these pairs overlap: the second element of one pair is the first element of the next pair.
     Also, because all pairs are considered simultaneously, inserted elements are not considered to be part
@@ -53,7 +53,7 @@ def count_next_step(pairs_and_counts: Counter, insertion_rules: Dict[str, str]) 
     return new_counts
 
 
-def count_chars(pair_counts: Counter[str, int], polymer_template: str) -> Counter[str, int]:
+def count_chars(pair_counts: Counter, polymer_template: str) -> Counter:
     # The last character in the polymer does not appear as the first of any pair,
     # so it needs to be incremented manually
     char_counts = Counter({polymer_template[-1]: 1})
