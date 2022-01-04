@@ -1,6 +1,6 @@
 from typing import List
-from functools import cache
 import os
+
 INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 
@@ -31,14 +31,13 @@ def calculate_total_non_linear_cost_to(positions: List[int], target: int) -> int
     return sum(_get_non_linear_cost(distance) for distance in distances)
 
 
-@cache
 def _get_non_linear_cost(distance: int) -> int:
     """
     Each change of 1 step in horizontal position costs 1 more unit of
     fuel than the last: the first step costs 1, the second step costs 2, the
     third step costs 3, and so on.
     """
-    return sum(i for i in range(0, distance+1))
+    return distance * (distance + 1) // 2
 
 
 if __name__ == '__main__':
