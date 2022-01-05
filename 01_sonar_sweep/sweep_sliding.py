@@ -2,7 +2,9 @@ from sweep import sonar_sweep, count_increasing_numbers
 
 
 def group_measurements(data):
-    """consider sums of a three-measurement sliding window"""
+    """
+    'Consider sums of a three-measurement sliding window.'
+    """
     result = []
 
     for i in range(0, len(data) - 2):
@@ -13,8 +15,10 @@ def group_measurements(data):
 
 
 if __name__ == '__main__':
-    """Your goal now is to count the number of times the sum of measurements 
-    in this sliding window increases from the previous sum."""
+    """
+    Your goal now is to count the number of times the sum of measurements 
+    in this sliding window increases from the previous sum.
+    """
 
     depths = sonar_sweep()
     sliding_depths = group_measurements(depths)

@@ -3,8 +3,10 @@ INPUT_FILE = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 
 def sonar_sweep():
-    """each line is a measurement of the sea floor depth as the sweep 
-    looks further and further away from the submarine."""
+    """
+    Each line is a measurement of the sea floor depth as the sweep 
+    looks further and further away from the submarine.
+    """
 
     with open(INPUT_FILE) as file:
         lines = file.readlines()
@@ -14,8 +16,10 @@ def sonar_sweep():
 
 
 def count_increasing_numbers(data):
-    """count the number of times a depth measurement increases 
-    from the previous measurement."""
+    """
+    Counts the number of times a depth measurement increases 
+    from the previous measurement.
+    """
 
     increased = 0
 

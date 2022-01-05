@@ -12,7 +12,9 @@ def parse_line(line):
 
 
 def read_course_file():
-    """The submarine seems to already have a planned course (your puzzle input)."""
+    """
+    The submarine seems to already have a planned course (your puzzle input).
+    """
     with open(INPUT_FILE) as file:
         lines = file.readlines()
 
